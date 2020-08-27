@@ -3,4 +3,8 @@
     <color name="colorPrimary">#6200EE</color>
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
+    <color name="cymatics">#e08210</color>
+    <color name="black">#191919</color>
+    <color name="mainhthene">#D1F0F5</color>
+    <color name="status">#A0C4E2</color>
 </resources>
