@@ -4,12 +4,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".Activities.MainActivity">
+
+    <androidx.appcompat.widget.Toolbar
+        android:layout_width="match_parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@android:color/background_light"
+        android:id="@+id/toolbar"
+        android:elevation="8dp"
+        android:layout_height="60dp"/>
     <FrameLayout
         android:id="@+id/fragment"
         android:layout_width="match_parent"
         android:background="#D1F0F5"
         android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
         app:layout_constraintBottom_toTopOf="@+id/navigation"/>
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:layout_width="match_parent"

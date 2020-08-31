@@ -1,18 +1,23 @@
 package com.example.musicplayerv1.Model;
 
-import java.util.ArrayList;
+import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
+import java.util.ArrayList;
+@Entity(tableName = "Playlist")
 public class Playlist {
-    private  String id;
+    @PrimaryKey
+    @NonNull
+    @ColumnInfo(name = "ID")
+    private  int id;
+    @ColumnInfo(name = "title")
     private String title;
-    private ArrayList<Track> tracks;
+    @ColumnInfo(name = "url")
     private String urlImage;
 
-    public Playlist(String id){
-        this.id = id;
-    }
     public Playlist(){
-
     }
 
     public String getTitle() {
@@ -23,16 +28,12 @@ public class Playlist {
         this.title = title;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public ArrayList<Track> getTracks() {
-        return tracks;
-    }
-
-    public void setTracks(ArrayList<Track> tracks) {
-        this.tracks = tracks;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getUrlImage() {

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/recent_play_layout"
+        android:elevation="8dp"
+        android:background="#D1F0F5"
+       android:layout_marginTop="30dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:id="@+id/recent_label"
+            android:layout_marginLeft="20dp"
+            android:text="Recently play"
+            android:typeface="serif"
+            android:textColor="@color/black"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/description_label"
+            android:typeface="serif"
+            android:layout_below="@+id/recent_label"
+            android:layout_marginLeft="20dp"
+            android:text="The songs that you have played recently"
+            />
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/recent_re"
+            android:layout_below="@+id/description_label"
+            android:layout_marginTop="10dp"/>
+    </RelativeLayout>

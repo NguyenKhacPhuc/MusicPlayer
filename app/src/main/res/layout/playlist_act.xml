@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+<androidx.core.widget.NestedScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#D1F0F5"
+   >
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/nameOfPlaylist"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:typeface="serif"
+        android:text="Ascend-Illenium"
+        android:layout_marginTop="24dp"
+        android:textSize="16sp"
+        android:textColor="@android:color/darker_gray"
+        />
+    <ImageButton
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:id="@+id/backBtn"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:elevation="8dp"
+        android:src="@drawable/arrow_back_24"
+        android:background="@drawable/round"
+        app:layout_constraintTop_toTopOf="parent"/>
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:id="@+id/playlist_Image"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/nameOfPlaylist"
+        android:layout_marginTop="64dp"
+        android:elevation="8dp"
+        android:src="@drawable/ashes_illlenium"
+       />
+    <ImageButton
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:id="@+id/favorite"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/playlist_Image"
+        app:layout_constraintBottom_toBottomOf="@+id/playlist_Image"
+        android:layout_marginBottom="100dp"
+        android:src="@drawable/ic_baseline_favorite_border_24"
+        android:background="@drawable/round"
+        android:elevation="8dp"/>
+    <ImageButton
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        app:layout_constraintStart_toEndOf="@+id/playlist_Image"
+        app:layout_constraintBottom_toBottomOf="@+id/playlist_Image"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="100dp"
+        android:background="@drawable/round"
+        android:src="@drawable/more_horiz_24"
+        android:elevation="8dp"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/playlist_rec"
+        android:layout_width="match_parent"
+        android:layout_marginTop="20dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/playlist_Image" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>
+</RelativeLayout>

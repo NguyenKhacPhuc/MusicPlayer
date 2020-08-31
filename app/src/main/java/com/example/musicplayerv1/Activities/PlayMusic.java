@@ -1,4 +1,4 @@
-package com.example.musicplayerv1;
+package com.example.musicplayerv1.Activities;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,6 +15,8 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
+
+import com.example.musicplayerv1.R;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 

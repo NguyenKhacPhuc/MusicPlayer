@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:title="Home"
+        android:id="@+id/home"
         android:icon="@drawable/ic_baseline_home_24"/>
     <item android:title="Stream"
+        android:id="@+id/stream"
         android:icon="@drawable/ic_baseline_highlight_24"/>
     <item android:title="Search"
+        android:id="@+id/search"
         android:icon="@drawable/ic_baseline_search_24"/>
     <item android:title="Playlist"
+        android:id="@+id/playlist"
         android:icon="@drawable/ic_baseline_playlist_play_24"/>
 </menu>
