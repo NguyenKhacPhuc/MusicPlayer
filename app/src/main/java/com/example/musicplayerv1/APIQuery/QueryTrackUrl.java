@@ -2,22 +2,27 @@ package com.example.musicplayerv1.APIQuery;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.util.Log;
 import android.util.SparseArray;
+import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
+import com.example.musicplayerv1.Common.ProgressDialogSingleton;
 import com.example.musicplayerv1.Constant;
 import com.example.musicplayerv1.Interfaces.IPassUrl;
+import com.example.musicplayerv1.Model.Track;
 import com.example.musicplayerv1.YoutubeConfig.YoutubeConstant;
 
 import at.huber.youtubeExtractor.VideoMeta;
 import at.huber.youtubeExtractor.YouTubeExtractor;
 import at.huber.youtubeExtractor.YtFile;
 
-public class QueryTrackUrl {
+public class  QueryTrackUrl  {
 
     private String id;
     private RequestQueue requestQueue;
     private Context context;
+    private YtFile ytFile;
 
     public QueryTrackUrl(String id, RequestQueue requestQueue, Context context) {
         this.id = id;
@@ -31,11 +36,23 @@ public class QueryTrackUrl {
         new YouTubeExtractor(context) {
             @Override
             protected void onExtractionComplete(SparseArray<YtFile> ytFiles, VideoMeta videoMeta) {
-                YtFile ytFile = ytFiles.get(140);
-                String finalUrl = ytFile.getUrl().replace("\\","");
-                iPassUrl.getUr(finalUrl);
+                try {
+                    ytFile = ytFiles.get(140);
+
+                    String finalUrl = ytFile.getUrl().replace("\\", "");
+                    String author = videoMeta.getTitle();
+                    String title = videoMeta.getAuthor();
+                    long duration = videoMeta.getVideoLength();
+                    String description = videoMeta.getShortDescription();
+                    String videoId = videoMeta.getVideoId();
+                    Track track = new Track(videoId, title, author, description, duration, finalUrl);
+                    iPassUrl.getUr(track);
+                }catch (NullPointerException n){
+                    Toast.makeText(context,"Error",Toast.LENGTH_SHORT).show();
+                }
             }
         }.extract(trackUrl,true,true);
 
     }
+
 }

@@ -11,25 +11,62 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/title"
-        android:layout_marginRight="4dp"
-        android:layout_marginLeft="4dp"
+        android:layout_marginLeft="16dp"
         android:typeface="serif"
-        android:text="Illenium"
-        android:textColor="@color/status"
+        android:text="Goodthings fall apart"
+        android:textColor="@color/black"
         android:maxLines="1"
         android:ellipsize="end"
         android:gravity="start"
         android:textSize="16sp"
         android:textStyle="bold"
-        android:layout_centerHorizontal="true"/>
-    <com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
-        android:id="@+id/player_view"
-        android:layout_below="@+id/title"
-        android:layout_width="match_parent"
+      />
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="4dp"
-        android:layout_marginRight="4dp"
+        android:layout_below="@+id/title"
+        android:id="@+id/artist"
+        android:text="ILLENIUM"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="4dp"
+        android:typeface="serif"
+        android:textSize="16dp"/>
+    <ImageView
+        android:id="@+id/thumbnail"
+        android:layout_below="@+id/artist"
+        android:layout_width="match_parent"
+        android:layout_height="260dp"
+        android:src="@drawable/ashes_illlenium"
+        android:scaleType="fitXY"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="4dp"
         android:layout_centerHorizontal="true"
-        android:visibility="visible"/>
-
+        android:contentDescription="Thumbnail" />
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/more_vert_24"
+        android:layout_below="@id/thumbnail"
+        android:id="@+id/more"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="16dp"
+        />
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/playlist_add_24"
+        android:layout_toLeftOf="@+id/more"
+        android:layout_below="@id/thumbnail"
+        android:id="@+id/add_to_playlist"
+        android:layout_marginRight="16dp"/>
+    <ImageView
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:id="@+id/fav"
+        android:src="@drawable/ic_baseline_favorite_border_24"
+        android:layout_toLeftOf="@+id/add_to_playlist"
+        android:layout_below="@id/thumbnail"
+        android:layout_marginRight="16dp"/>
 </RelativeLayout>

@@ -7,6 +7,16 @@
         android:elevation="8dp"
         android:background="#D1F0F5"
        android:layout_marginTop="30dp">
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/shuffle_24"
+        android:id="@+id/shuffleBtn"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/round"
+        android:layout_marginRight="20dp"
+        />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

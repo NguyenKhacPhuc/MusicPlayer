@@ -6,6 +6,6 @@ public class YoutubeConstant {
     public static final String PART = "part=";
     public static final String PLAYLIST_ID = "&playlistId=";
     public static final String KEY = "&key=";
-    public static final String API_KEY ="AIzaSyBbVnpAsMDicrzefKcKuk6gVVl_A5ZxI84";
+    public static final String API_KEY ="AIzaSyCBgD7djAQJ_mu_1hGyHXwXvoIXMYD9fnM";
     public static final String YOUTUBE_LINK= "https://www.youtube.com/watch?v=";
 }

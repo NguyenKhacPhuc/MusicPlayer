@@ -1,18 +1,13 @@
 package com.example.musicplayerv1.APIQuery;
 
-import android.util.Log;
-import android.widget.Toast;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.example.musicplayerv1.Adapters.MainReAdapter;
-import com.example.musicplayerv1.Adapters.PreviewAdapter;
-import com.example.musicplayerv1.Interfaces.IItemPreviewClick;
-import com.example.musicplayerv1.Interfaces.IYoutubePlaylistCallBack;
-import com.example.musicplayerv1.Model.Model;
+import com.example.musicplayerv1.Adapters.StreamAdadpter;
 import com.example.musicplayerv1.Model.Track;
 import com.example.musicplayerv1.YoutubeConfig.YoutubeConstant;
 
@@ -22,23 +17,16 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class YoutubeQuery implements Runnable {
-    private ArrayList<Track> tracks;
-    private ArrayList<Model> models;
-    private MainReAdapter mainReAdapter;
-    private Model model;
-    private IItemPreviewClick iItemPreviewClick;
-    private RequestQueue requestQueue;
+public class YoutubeStreamQuery implements Runnable {
+    private final ArrayList<Track> tracks;
+    private final StreamAdadpter adapter;
+    private final RequestQueue requestQueue;
 
-    public YoutubeQuery(ArrayList<Model> models, MainReAdapter mainReAdapter, Model model, IItemPreviewClick iItemPreviewClick, RequestQueue requestQueue) {
-        this.models = models;
-        this.mainReAdapter = mainReAdapter;
-        this.model = model;
-        this.iItemPreviewClick = iItemPreviewClick;
+    public YoutubeStreamQuery(ArrayList<Track> tracks, StreamAdadpter adapter, RequestQueue requestQueue){
+        this.tracks = tracks;
+        this.adapter = adapter;
         this.requestQueue = requestQueue;
-        tracks = new ArrayList<>();
     }
-
     @Override
     public void run() {
         String url = YoutubeConstant.SCHEME
@@ -46,10 +34,11 @@ public class YoutubeQuery implements Runnable {
                 +YoutubeConstant.PART
                 +"snippet"
                 +YoutubeConstant.PLAYLIST_ID
-                +model.getIdList()
+                +"PLDfKAXSi6kUZnATwAUfN6tg1dULU-7XcD"
                 +YoutubeConstant.KEY
                 +YoutubeConstant.API_KEY
-                +"&maxResults=50";
+                +"&maxResults=50"
+                ;
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET
                 ,url,null, new Response.Listener<JSONObject>() {
 
@@ -72,10 +61,8 @@ public class YoutubeQuery implements Runnable {
                         Track track = new Track(id,trackName, channelTitle,thumbnailUrl);
                         tracks.add(track);
                     }
-                    model.setTracks(tracks);
-                    model.setiItemPreviewClick(iItemPreviewClick);
-                    models.add(model);
-                    mainReAdapter.notifyItemInserted(models.size());
+
+                    adapter.notifyItemInserted(tracks.size());
 
                 } catch (JSONException e) {
                     e.printStackTrace();

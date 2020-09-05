@@ -64,7 +64,7 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.PreviewH
 
         @Override
         public void onClick(View v) {
-            iItemPreviewClick.onItemClick(getAdapterPosition(),tracks.get(getAdapterPosition()).getId());
+            iItemPreviewClick.onItemClick(getAdapterPosition(),tracks);
         }
     }
 }

@@ -13,6 +13,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class ModelQuery {
     private FirebaseFirestore db ;
@@ -25,12 +26,14 @@ public class ModelQuery {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if(task.isSuccessful()){
-                    for(QueryDocumentSnapshot documentSnapshot: task.getResult()){
+                    for(QueryDocumentSnapshot documentSnapshot: Objects.requireNonNull(task.getResult())){
                         String title = documentSnapshot.getString("Title");
                         String description = documentSnapshot.getString("Description");
                         String tag = documentSnapshot.getString("tag");
                         String idList = documentSnapshot.getString("idList");
                         Model model = new Model(title,description,tag,idList);
+                        assert title != null;
+                        Log.d("title",title);
                         models.add(model);
                     }
                     iCallBackModel.callBackModels(models);
