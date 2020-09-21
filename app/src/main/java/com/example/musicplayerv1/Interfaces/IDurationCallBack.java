@@ -1,5 +1,5 @@
 package com.example.musicplayerv1.Interfaces;
 
 public interface IDurationCallBack {
-    void passDuration(long duration);
+    void passDuration(long duration,int index);
 }

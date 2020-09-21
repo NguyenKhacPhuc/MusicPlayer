@@ -19,4 +19,10 @@ public interface TrackDAO {
     public void deleteATrack(String trackId);
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public void insertATrack(Track track);
+    @Query("Update Track set isLike =:like")
+    public void updateLike(boolean like);
+    @Query("Update Track set downloaded =:download")
+    public void updateDownload(boolean download);
+    @Query("Update Track set streamLink =:streamLink")
+    public void updateStreamLink(String streamLink);
 }

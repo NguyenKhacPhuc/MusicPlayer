@@ -48,7 +48,7 @@ public class  QueryTrackUrl  {
                     Track track = new Track(videoId, title, author, description, duration, finalUrl);
                     iPassUrl.getUr(track);
                 }catch (NullPointerException n){
-                    Toast.makeText(context,"Error",Toast.LENGTH_SHORT).show();
+                    n.printStackTrace();
                 }
             }
         }.extract(trackUrl,true,true);

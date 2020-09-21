@@ -4,69 +4,53 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.musicplayerv1.Interfaces.IItemPlaylisClick;
-import com.example.musicplayerv1.Model.Track;
+import com.example.musicplayerv1.Model.Playlist;
 import com.example.musicplayerv1.R;
 
 import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.TrackHolder> {
+public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.PlaylistHolder> {
+    ArrayList<Playlist> playlists;
     Context context;
-    ArrayList<Track> tracks;
-    IItemPlaylisClick iItemPlaylisClick;
-    public PlaylistAdapter(Context context, ArrayList<Track> tracks,IItemPlaylisClick iItemPlaylisClick){
+    public PlaylistAdapter(ArrayList<Playlist> playlists,Context context){
+        this.playlists = playlists;
         this.context = context;
-        this.tracks = tracks;
-        this.iItemPlaylisClick = iItemPlaylisClick;
+
     }
     @NonNull
     @Override
-    public TrackHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(context).inflate(R.layout.item_playlist,parent,false);
-        return new TrackHolder(v,iItemPlaylisClick);
+    public PlaylistHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View v = LayoutInflater.from(context).inflate(R.layout.item_playlist_layout,parent,false);
+
+        return new PlaylistHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull TrackHolder holder, int position) {
-        holder.artist.setText(tracks.get(position).getArtist());
-        holder.title.setText(tracks.get(position).getTrackName());
-        Glide.with(context).load(tracks.get(position).getUrlThumbnail()).into(holder.thumbnail);
+    public void onBindViewHolder(@NonNull PlaylistHolder holder, int position) {
+            holder.playlistName.setText(playlists.get(position).getTitle());
+            Glide.with(context).load(playlists.get(position).getUrlImage()).into(holder.thumbnail);
     }
 
     @Override
     public int getItemCount() {
-        return tracks.size();
+        return playlists.size();
     }
 
-    public class TrackHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView title;
-        TextView artist;
-        ImageButton play;
+    class PlaylistHolder extends RecyclerView.ViewHolder{
         CircleImageView thumbnail;
-        IItemPlaylisClick iItemPlaylisClick;
-        public TrackHolder(@NonNull View itemView,IItemPlaylisClick iItemPlaylisClick) {
+        TextView playlistName;
+        public PlaylistHolder(@NonNull View itemView) {
             super(itemView);
-            title = itemView.findViewById(R.id.title);
-            artist = itemView.findViewById(R.id.artist);
-            play = itemView.findViewById(R.id.play);
-            thumbnail = itemView.findViewById(R.id.thumbnail);
-            itemView.setOnClickListener(this);
-            this.iItemPlaylisClick = iItemPlaylisClick;
-
-        }
-
-        @Override
-        public void onClick(View v) {
-            iItemPlaylisClick.onClick(getAdapterPosition(),play);
+            thumbnail = itemView.findViewById(R.id.playlist_thumbnail);
+            playlistName = itemView.findViewById(R.id.playlist_name);
         }
     }
 }

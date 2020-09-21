@@ -12,14 +12,14 @@ import java.io.Serializable;
 public class Track implements Serializable {
     @NonNull
     @PrimaryKey
+
     @ColumnInfo(name = "trackId")
     private  String id;
     @ColumnInfo(name = "artist")
     private String artist;
     @ColumnInfo(name = "trackName")
     private String trackName;
-    @ColumnInfo(name = "tag")
-    private String tag;
+
     @ColumnInfo(name = "urlThumbnail")
     private String urlThumbnail;
     @ColumnInfo(name="isLike")
@@ -30,18 +30,22 @@ public class Track implements Serializable {
     private long duration;
     @ColumnInfo(name = "streamLink")
     private String streamLink;
+    @ColumnInfo(name = "downloaded")
+    private boolean downloaded;
+
+
     public String getDescription() {
         return description;
     }
 
-    public Track(String id, String artist, String trackName, String tag, String urlThumbnail, boolean isLike,String description) {
+    public Track(String id, String artist, String trackName, String urlThumbnail, boolean isLike,String description,String streamLink) {
         this.id = id;
         this.artist = artist;
         this.trackName = trackName;
-        this.tag = tag;
         this.urlThumbnail = urlThumbnail;
         this.isLike = isLike;
         this.description = description;
+        this.streamLink = streamLink;
 
     }
     @Ignore
@@ -50,6 +54,7 @@ public class Track implements Serializable {
         this.artist = artist;
         this.urlThumbnail = urlThumbnail;
         this.id = id;
+
     }
    @Ignore
     public Track(String id,String trackName, String artist,String description,long duration,String streamLink){
@@ -64,7 +69,7 @@ public class Track implements Serializable {
         this.description = description;
     }
 
-    public void setId(@NonNull String id) {
+    public void setId( String id) {
         this.id = id;
     }
 
@@ -88,13 +93,6 @@ public class Track implements Serializable {
         this.trackName = trackName;
     }
 
-    public String getTag() {
-        return tag;
-    }
-
-    public void setTag(String tag) {
-        this.tag = tag;
-    }
 
     public String getUrlThumbnail() {
         return urlThumbnail;
@@ -112,7 +110,13 @@ public class Track implements Serializable {
         isLike = like;
     }
 
+    public boolean isDownloaded() {
+        return downloaded;
+    }
 
+    public void setDownloaded(boolean downloaded) {
+        this.downloaded = downloaded;
+    }
 
     public long getDuration() {
         return duration;
@@ -136,7 +140,6 @@ public class Track implements Serializable {
                 "id='" + id + '\'' +
                 ", artist='" + artist + '\'' +
                 ", trackName='" + trackName + '\'' +
-                ", tag='" + tag + '\'' +
                 ", urlThumbnail='" + urlThumbnail + '\'' +
                 ", isLike=" + isLike +
                 ", description='" + description + '\'' +

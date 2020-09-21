@@ -6,6 +6,7 @@ import android.content.Intent;
 
 
 import android.os.CountDownTimer;
+import android.util.Log;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,6 +22,7 @@ import com.example.musicplayerv1.Interfaces.IPassUrl;
 import com.example.musicplayerv1.Model.Track;
 
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
@@ -31,14 +33,14 @@ public class Timer {
     IDurationCallBack iDurationCallBack;
     MyCountDownTimer countDownTimer;
     ArrayList<Track> tempTracks;
+    int index;
     Context context;
 
-
     public Timer(final ArrayList<Track> tracks
-            , final Context context) {
+            , final Context context,int index) {
         this.tempTracks = tracks;
         this.context = context;
-
+        this.index = index;
     }
 
     public void countDown(final SeekBar seekbar
@@ -47,8 +49,13 @@ public class Timer {
             , final TextView start
             , final TextView end
             , final RequestQueue requestQueue
+            ,boolean isNotRewind
 
     ) {
+        if(isNotRewind){
+            index++;
+        }
+
 
         seekbar.setProgress((int) (currentProgress/1000));
         temp = duration;
@@ -75,37 +82,28 @@ public class Timer {
 
             @Override
             public void onFinish() {
-                if (!tempTracks.isEmpty() && context != null) {
-                    Collections.shuffle(tempTracks);
-                    Random ran = new Random();
-                    int position = ran.nextInt(tempTracks.size());
-                    final Track track = tempTracks.get(position);
-                    QueryTrackUrl queryTrackUrl = new QueryTrackUrl(track.getId(),requestQueue,context);
 
+                if (!tempTracks.isEmpty() && context != null) {
+                    final Track track = tempTracks.get(index);
+                    if(track.isDownloaded()){
+                        sendBroadcast(track.getStreamLink(),track.getUrlThumbnail(),track.getDuration(),track.getDescription(),track.getTrackName(),track.getArtist());
+                    }
+                    QueryTrackUrl queryTrackUrl = new QueryTrackUrl(track.getId(),requestQueue,context);
                     queryTrackUrl.returnUrl(new IPassUrl() {
                         @Override
                         public void getUr(Track url) {
-                            Intent intent = new Intent();
-                            intent.setAction("Pass Track to Home Fragment");
-                            intent.putExtra("streamLink", url.getStreamLink());
-                            intent.putExtra("urlThumbnail", track.getUrlThumbnail());
-                            intent.putExtra("duration", url.getDuration());
-                            intent.putExtra("description", url.getDescription());
-                            intent.putExtra("channelName", url.getTrackName());
-                            intent.putExtra("Title", url.getArtist());
-                            iDurationCallBack.passDuration(url.getDuration());
-                            context.sendBroadcast(intent);
+                            sendBroadcast(url.getStreamLink(),track.getUrlThumbnail(),url.getDuration(),track.getDescription(),track.getTrackName(),track.getArtist());
+                            iDurationCallBack.passDuration(url.getDuration(),index);
 
                         }
                     });
                 }
                 iDurationCallBack = new IDurationCallBack() {
                     @Override
-                    public void passDuration(long duration) {
+                    public void passDuration(long duration,int index) {
                             long milDuration = duration *1000;
                             int max = (int)duration;
-                            Toast.makeText(context,String.valueOf(max),Toast.LENGTH_SHORT).show();
-                        seekbar.setMax(max);
+                            seekbar.setMax(max);
 //                            temp= milDuration;
 //                            currentTemp = 0;
 //                            current = 0;
@@ -114,14 +112,28 @@ public class Timer {
 //                        countDownTimer.setMillisInFuture(milDuration);
 //                        countDownTimer.setCountdownInterval(1000);
 //                        countDownTimer.start();
-                        countDown(seekbar,0,milDuration,start,end,requestQueue);
+                            countDown(seekbar,0,milDuration,start,end,requestQueue,true);
 
                     }
                 };
             }
         }.start();
     }
-
+    private void sendBroadcast(String streamLink,String urlThumbnail,long duration,String description,String trackName,String artist){
+        Intent intent = new Intent();
+        intent.setAction("Pass Track to Home Fragment");
+        intent.putExtra("streamLink", streamLink);
+        intent.putExtra("urlThumbnail", urlThumbnail);
+        intent.putExtra("duration", duration);
+        intent.putExtra("description", description);
+        intent.putExtra("channelName", trackName);
+        intent.putExtra("Title",artist);
+        intent.putExtra("tracks", (Serializable)tempTracks);
+        context.sendBroadcast(intent);
+    }
+    public void cancel(){
+        countDownTimer.cancel();
+    }
 }
 
 

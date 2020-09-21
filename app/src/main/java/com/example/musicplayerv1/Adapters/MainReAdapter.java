@@ -40,11 +40,11 @@ public class MainReAdapter extends RecyclerView.Adapter<MainReAdapter.LayoutHold
         holder.recent_lable.setText(models.get(position).getTitle());
         holder.description.setText(models.get(position).getDescription());
         holder.recyclerView.setLayoutManager(new LinearLayoutManager(context,RecyclerView.HORIZONTAL,false));
-        Collections.shuffle(models.get(position).getTracks());
+//        Collections.shuffle(models.get(position).getTracks());
         holder.recyclerView.setAdapter(new PreviewAdapter(context
                 ,models.get(position).getTracks()
                 ,models.get(position).getiItemPreviewClick()
-                ,models.get(position).getmTag()));
+                ));
     }
 
     @Override

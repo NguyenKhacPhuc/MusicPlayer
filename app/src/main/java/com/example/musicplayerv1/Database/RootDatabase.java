@@ -8,10 +8,11 @@ import androidx.room.RoomDatabase;
 import com.example.musicplayerv1.DAO.ContainerDAO;
 import com.example.musicplayerv1.DAO.PlaylistDAO;
 import com.example.musicplayerv1.DAO.TrackDAO;
+import com.example.musicplayerv1.Model.Container;
 import com.example.musicplayerv1.Model.Playlist;
 import com.example.musicplayerv1.Model.Track;
 
-@androidx.room.Database(entities = {Track.class, Playlist.class},version = 1)
+@androidx.room.Database(entities = {Track.class, Playlist.class, Container.class},version = 2)
 public abstract class RootDatabase extends RoomDatabase {
     private static volatile RootDatabase INSTANCE;
     public abstract TrackDAO trackDAO();
@@ -24,6 +25,7 @@ public abstract class RootDatabase extends RoomDatabase {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                             RootDatabase.class, "Database.db")
+                            .fallbackToDestructiveMigration()
                             .build();
                 }
             }

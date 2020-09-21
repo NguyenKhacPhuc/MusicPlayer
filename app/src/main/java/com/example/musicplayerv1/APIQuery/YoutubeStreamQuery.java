@@ -37,7 +37,7 @@ public class YoutubeStreamQuery implements Runnable {
                 +"PLDfKAXSi6kUZnATwAUfN6tg1dULU-7XcD"
                 +YoutubeConstant.KEY
                 +YoutubeConstant.API_KEY
-                +"&maxResults=50"
+                +"&maxResults=10"
                 ;
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET
                 ,url,null, new Response.Listener<JSONObject>() {

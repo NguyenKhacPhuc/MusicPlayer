@@ -17,30 +17,20 @@ import com.example.musicplayerv1.R;
 
 import java.util.ArrayList;
 
-public class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.PreviewHolder> {
-    Context context;
+public class SearchModelAdapter extends RecyclerView.Adapter<SearchModelAdapter.SearchModel> {
     ArrayList<Track> tracks;
+    Context context;
     IItemPreviewClick iItemPreviewClick;
-    String mTag;
-    public PreviewAdapter(Context context,ArrayList<Track> tracks,IItemPreviewClick iItemPreviewClick){
-        this.context = context;
+    public SearchModelAdapter(ArrayList<Track> tracks, Context context,IItemPreviewClick iItemPreviewClick){
         this.tracks = tracks;
+        this.context =context;
         this.iItemPreviewClick = iItemPreviewClick;
-
     }
     @NonNull
     @Override
-    public PreviewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(context).inflate(R.layout.item_preview,parent,false);
-        return new PreviewHolder(v,iItemPreviewClick);
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull PreviewHolder holder, int position) {
-            holder.trackName.setText(tracks.get(position).getTrackName());
-            holder.artist.setText(tracks.get(position).getArtist());
-            Glide.with(context).load(tracks.get(position).getUrlThumbnail()).into(holder.imageView);
-
+    public SearchModel onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View v = LayoutInflater.from(context).inflate(R.layout.item_search,parent,false);
+        return new SearchModel(v,iItemPreviewClick);
     }
 
     @Override
@@ -48,14 +38,21 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.PreviewH
         return tracks.size();
     }
 
-    public class PreviewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        ImageView imageView;
+    @Override
+    public void onBindViewHolder(@NonNull SearchModel holder, int position) {
+        Glide.with(context).load(tracks.get(position).getUrlThumbnail()).into(holder.thumbnail);
+        holder.artist.setText(tracks.get(position).getArtist());
+        holder.trackName.setText(tracks.get(position).getTrackName());
+    }
+
+    public class SearchModel extends RecyclerView.ViewHolder implements View.OnClickListener {
+        ImageView thumbnail;
         TextView artist;
         TextView trackName;
         IItemPreviewClick iItemPreviewClick;
-        public PreviewHolder(@NonNull View itemView,IItemPreviewClick iItemPreviewClick) {
+        public SearchModel(@NonNull View itemView,IItemPreviewClick iItemPreviewClick) {
             super(itemView);
-            imageView = itemView.findViewById(R.id.thumbnail);
+            thumbnail = itemView.findViewById(R.id.thumbnail);
             artist = itemView.findViewById(R.id.artist);
             trackName = itemView.findViewById(R.id.track_name);
             itemView.setOnClickListener(this);

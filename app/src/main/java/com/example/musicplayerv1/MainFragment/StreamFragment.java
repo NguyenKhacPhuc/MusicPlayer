@@ -25,6 +25,7 @@ import com.android.volley.toolbox.Volley;
 import com.example.musicplayerv1.APIQuery.YoutubeStreamQuery;
 import com.example.musicplayerv1.Activities.PlayMusic;
 import com.example.musicplayerv1.Adapters.StreamAdadpter;
+import com.example.musicplayerv1.Injection;
 import com.example.musicplayerv1.Interfaces.IItemPreviewClick;
 import com.example.musicplayerv1.Interfaces.IStreamItemCallBack;
 import com.example.musicplayerv1.Model.Track;
@@ -67,6 +68,7 @@ public class StreamFragment extends Fragment implements IStreamItemCallBack, Pop
     private void addData(){
         YoutubeStreamQuery youtubeStreamQuery = new YoutubeStreamQuery(tracks,streamAdadpter,requestQueue);
         youtubeStreamQuery.run();
+
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)

@@ -22,14 +22,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import com.example.musicplayerv1.APIQuery.ModelQuery;
+import com.example.musicplayerv1.APIQuery.QueryTrackUrl;
 import com.example.musicplayerv1.APIQuery.YoutubeModelQuery;
 import com.example.musicplayerv1.Activities.PlayMusic;
 import com.example.musicplayerv1.Adapters.MainReAdapter;
 import com.example.musicplayerv1.Common.Checking;
 import com.example.musicplayerv1.Common.ProgressDialogSingleton;
+import com.example.musicplayerv1.Injection;
 import com.example.musicplayerv1.Interfaces.ICallBackModel;
 import com.example.musicplayerv1.Interfaces.IItemPreviewClick;
 import com.example.musicplayerv1.Interfaces.IModelOnClick;
+import com.example.musicplayerv1.Interfaces.IPassUrl;
 import com.example.musicplayerv1.Model.Model;
 import com.example.musicplayerv1.Model.Track;
 import com.example.musicplayerv1.Services.MusicPlayService;
@@ -48,6 +51,7 @@ import java.util.concurrent.Executors;
 import static androidx.core.content.ContextCompat.getSystemService;
 
 public class HomeFragment extends Fragment implements IItemPreviewClick, IModelOnClick {
+    static boolean active = false;
     RecyclerView mainRe;
     MainReAdapter mainReAdapter;
     ArrayList<Model> models;
@@ -67,7 +71,8 @@ public class HomeFragment extends Fragment implements IItemPreviewClick, IModelO
         mainRe.setLayoutManager(linearLayoutManager);
         mainRe.setAdapter(mainReAdapter);
 
-        addModelData();
+            addModelData();
+
 
         return v;
     }
@@ -84,16 +89,17 @@ public class HomeFragment extends Fragment implements IItemPreviewClick, IModelO
     public void onItemClick(int position,ArrayList<Track> tracks) {
         Objects.requireNonNull(getActivity()).stopService(new Intent(getContext(),MusicPlayService.class));
 
+//        Injection.getProvidedTrackLocalStorage(getContext()).insert(tracks.get(position));
                 Intent intent = new Intent(getContext(),PlayMusic.class);
-                intent.putExtra("tracks", (Serializable)tracks);
-                intent.putExtra("position",position);
+        intent.putExtra("tracks", (Serializable) tracks);
+        intent.putExtra("position", position);
+        intent.putExtra("playPoint", 0L);
                 Objects.requireNonNull(getContext()).startActivity(intent);
 
     }
 
     void addModelData(){
         final ModelQuery modelQuery = new ModelQuery();
-        ProgressDialogSingleton.getInstance(getContext()).show();
         final ExecutorService executor = Executors.newSingleThreadExecutor();
         executor .execute(new Runnable() {
             @Override
@@ -102,11 +108,10 @@ public class HomeFragment extends Fragment implements IItemPreviewClick, IModelO
                     @Override
                     public void callBackModels(final ArrayList<Model> multipleModels) {
 
-                        for(int i = 0; i <multipleModels.size();i++){
-                            executor.execute(new YoutubeModelQuery(models,mainReAdapter,multipleModels.get(i),HomeFragment.this,requestQueue) {
+                        for(int i = 0; i <multipleModels.size();i++) {
+                            executor.execute(new YoutubeModelQuery(models, mainReAdapter, multipleModels.get(i), HomeFragment.this, requestQueue) {
                             });
                         }
-                        ProgressDialogSingleton.getInstance(getContext()).dismiss();
                         executor.shutdown();
             }
         });
@@ -119,26 +124,22 @@ public class HomeFragment extends Fragment implements IItemPreviewClick, IModelO
     public void modelOnClick(final ArrayList<Track> tracks) {
         Collections.shuffle(tracks);
         this.tracks = tracks;
-
-//        if(Objects.requireNonNull(getActivity()).startService(new Intent(getContext(),MusicPlayService.class))!= null){
-//            getActivity().stopService(new Intent(getContext(),MusicPlayService.class));
-//            QueryTrackUrl queryTrackUrl = new QueryTrackUrl(tracks.get(0).getId(),requestQueue,getContext());
-//            queryTrackUrl.returnUrl(new IPassUrl() {
-//                @Override
-//                public void getUr(Track url) {
-//                    Intent intent = new Intent(getContext(),PlayMusic.class);
-//                    intent.putExtra("title", url.getTrackName());
-//                    intent.putExtra("Artist", url.getArtist());
-//                    intent.putExtra("duration",url.getDuration());
-//                    intent.putExtra("thumbnail",tracks.get(0).getUrlThumbnail());
-//                    intent.putExtra("description", url.getDescription());
-//                    intent.putExtra("isLiked",false);
-//                    intent.putExtra("streamLink", url.getStreamLink());
-//                    Objects.requireNonNull(getContext()).startActivity(intent);
-//                }
-//            });
-//        }
+        Intent intent = new Intent(getContext(),PlayMusic.class);
+        intent.putExtra("tracks", (Serializable)tracks);
+        intent.putExtra("position",0);
+        Objects.requireNonNull(getContext()).startActivity(intent);
 
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        active = true;
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        active = false;
+    }
 }

@@ -1,5 +1,7 @@
 package com.example.musicplayerv1.ModelLocalDataSource;
 
+import androidx.room.Query;
+
 import com.example.musicplayerv1.DAO.TrackDAO;
 import com.example.musicplayerv1.Interfaces.LocalDataSource;
 import com.example.musicplayerv1.Model.Track;
@@ -29,5 +31,12 @@ public class TrackLocalDataSource implements LocalDataSource<Track> {
     @Override
     public void insert(Track track) {
         trackDAO.insertATrack(track);
+    }
+    public void updateLike(boolean like){
+        trackDAO.updateLike(like);
+    }
+
+    public void updateDownload(boolean download){
+        trackDAO.updateDownload(download);
     }
 }
