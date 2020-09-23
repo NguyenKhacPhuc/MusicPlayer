@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,10 +14,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.musicplayerv1.Activities.PlayMusic;
+import com.example.musicplayerv1.Activities.PlaylistActivity;
 import com.example.musicplayerv1.Adapters.PlaylistAdapter;
 import com.example.musicplayerv1.Adapters.PreviewAdapter;
 import com.example.musicplayerv1.Injection;
 import com.example.musicplayerv1.Interfaces.IItemPreviewClick;
+import com.example.musicplayerv1.Interfaces.IPlaylistClick;
+import com.example.musicplayerv1.Model.Container;
 import com.example.musicplayerv1.Model.Playlist;
 import com.example.musicplayerv1.Model.Track;
 import com.example.musicplayerv1.ModelLocalDataSource.PlaylistLocalDataSource;
@@ -31,13 +35,14 @@ import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class PlaylistFragment extends Fragment implements IItemPreviewClick {
+public class PlaylistFragment extends Fragment implements IItemPreviewClick, IPlaylistClick {
     RecyclerView playlist_re;
     RecyclerView recentPlay;
     ArrayList<Playlist> playlists;
+    ArrayList<Track> recentTracks;
     ArrayList<Track> tracks;
-    PlaylistLocalDataSource playlistLocalDataSource;
-    TrackLocalDataSource trackLocalDataSource;
+    ArrayList<Container> containers;
+    public static final int position = 3;
     ExecutorService executorService;
     View v;
     @Nullable
@@ -49,34 +54,45 @@ public class PlaylistFragment extends Fragment implements IItemPreviewClick {
         LinearLayoutManager linearLayoutManager2 = new LinearLayoutManager(getContext(),RecyclerView.HORIZONTAL,false);
         playlist_re.setLayoutManager(linearLayoutManager);
         recentPlay.setLayoutManager(linearLayoutManager2);
-//        playlists = (ArrayList<Playlist>) playlistLocalDataSource.getAll();
-        final PreviewAdapter previewAdapter = new PreviewAdapter(getContext(),tracks,this);
-        PlaylistAdapter playlistAdapter = new PlaylistAdapter(playlists,getContext());
-        recentPlay.setAdapter(previewAdapter);
+        final PreviewAdapter recentPlayAdapter = new PreviewAdapter(getContext(),recentTracks,this);
+        final PlaylistAdapter playlistAdapter = new PlaylistAdapter(playlists,getContext(),this);
+        recentPlay.setAdapter(recentPlayAdapter);
+        playlist_re.setAdapter(playlistAdapter);
        executorService.execute(new Runnable() {
            @Override
            public void run() {
-
-               tracks.addAll(Injection.getProvidedTrackLocalStorage(getContext()).getAll());
-               Collections.reverse(tracks);
+               recentTracks.clear();
+               recentTracks.addAll(Injection.getProvidedTrackLocalStorage(getContext()).getAll());
+               Collections.reverse(recentTracks);
                Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
                    @Override
                    public void run() {
-                       previewAdapter.notifyDataSetChanged();
+                       recentPlayAdapter.notifyDataSetChanged();
                    }
                });
-
            }
        });
-
+        executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                playlists.clear();
+                playlists.addAll( Injection.getProvidedPlaylistLocalStorage(getContext()).getAll());
+                Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        playlistAdapter.notifyDataSetChanged();
+                    }
+                });
+            }
+        });
         return  v;
     }
     void init(){
         playlist_re = v.findViewById(R.id.playlist_rec);
         recentPlay = v.findViewById(R.id.recent_re_playlist);
         playlists = new ArrayList<>();
+        recentTracks = new ArrayList<>();
         tracks = new ArrayList<>();
-//        playlistLocalDataSource = Injection.getProvidedPlaylistLocalStorage(getContext());
         executorService = Executors.newSingleThreadExecutor();
 
     }
@@ -84,10 +100,35 @@ public class PlaylistFragment extends Fragment implements IItemPreviewClick {
     @Override
     public void onItemClick(int position, ArrayList<Track> tracks) {
         Objects.requireNonNull(getActivity()).stopService(new Intent(getContext(), MusicPlayService.class));
-
         Intent intent = new Intent(getContext(), PlayMusic.class);
         intent.putExtra("tracks", (Serializable)tracks);
         intent.putExtra("position",position);
         Objects.requireNonNull(getContext()).startActivity(intent);
+    }
+
+    @Override
+    public void onPlaylistClick(final int position) {
+        Playlist playlist = playlists.get(position);
+        final String name = playlist.getTitle();
+        executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                containers.clear();
+                containers.addAll ( Injection.getProvidedContainerLocalStorage(getContext()).getTracks(name));
+                for(final Container container : containers){
+                    executorService.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            tracks.add(Injection.getProvidedTrackLocalStorage(getContext()).getA(container.getTrackID()));
+                        }
+                    });
+                }
+                Intent intent = new Intent(getContext(), PlaylistActivity.class);
+                intent.putExtra("tracks", (Serializable)tracks);
+                intent.putExtra("position",position);
+                startActivity(intent);
+            }
+        });
+
     }
 }

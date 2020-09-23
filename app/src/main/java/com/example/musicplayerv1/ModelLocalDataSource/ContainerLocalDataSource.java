@@ -18,7 +18,7 @@ public class ContainerLocalDataSource implements LocalDataSource<Container> {
     }
 
     @Override
-    public List<Container> getA(String id) {
+    public Container getA(String id) {
         return null;
     }
 

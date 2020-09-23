@@ -9,7 +9,8 @@ public class YoutubeConstant {
     public static final String TYPE = "&type=";
     public static final String PLAYLIST_ID = "&playlistId=";
     public static final String KEY = "&key=";
-    public static final String API_KEY ="AIzaSyCl1eiH5Ee9E_Zz1eIHf9_mylVcTzoeL04";
-    public static final String API__SEARCH_KEY ="AIzaSyB8jA2yzE3ZRZkxHT_Mbmxc1ZnTjApU8mc";
+    public static final String API_KEY ="AIzaSyCLO2b3NUtOv2YVr1kSd-Q5CXzIsy77cTg";
+
+    public static final String API__SEARCH_KEY ="AIzaSyBDE0iXJOqCXogpQhbbScN7nLyrKWY3bD8";
     public static final String YOUTUBE_LINK= "https://www.youtube.com/watch?v=";
 }

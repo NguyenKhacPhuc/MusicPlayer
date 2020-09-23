@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.musicplayerv1.Interfaces.IPlaylistClick;
 import com.example.musicplayerv1.Model.Playlist;
 import com.example.musicplayerv1.R;
 
@@ -20,9 +21,11 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.PlaylistHolder> {
     ArrayList<Playlist> playlists;
     Context context;
-    public PlaylistAdapter(ArrayList<Playlist> playlists,Context context){
+    IPlaylistClick iPlaylistClick;
+    public PlaylistAdapter(ArrayList<Playlist> playlists,Context context,IPlaylistClick iPlaylistClick){
         this.playlists = playlists;
         this.context = context;
+        this.iPlaylistClick = iPlaylistClick;
 
     }
     @NonNull
@@ -30,7 +33,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
     public PlaylistHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(context).inflate(R.layout.item_playlist_layout,parent,false);
 
-        return new PlaylistHolder(v);
+        return new PlaylistHolder(v,iPlaylistClick);
     }
 
     @Override
@@ -44,13 +47,21 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
         return playlists.size();
     }
 
-    class PlaylistHolder extends RecyclerView.ViewHolder{
+    class PlaylistHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         CircleImageView thumbnail;
         TextView playlistName;
-        public PlaylistHolder(@NonNull View itemView) {
+        IPlaylistClick iPlaylistClick;
+        public PlaylistHolder(@NonNull View itemView,IPlaylistClick iPlaylistClick) {
             super(itemView);
             thumbnail = itemView.findViewById(R.id.playlist_thumbnail);
             playlistName = itemView.findViewById(R.id.playlist_name);
+            this.iPlaylistClick = iPlaylistClick;
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            iPlaylistClick.onPlaylistClick(getAdapterPosition());
         }
     }
 }

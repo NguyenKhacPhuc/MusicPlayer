@@ -43,6 +43,7 @@ public class StreamFragment extends Fragment implements IStreamItemCallBack, Pop
     StreamAdadpter streamAdadpter;
     RequestQueue requestQueue;
     PopupMenu popupMenu;
+    public static final int position = 2;
     View v;
     @Nullable
     @Override

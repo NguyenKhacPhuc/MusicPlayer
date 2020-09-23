@@ -43,6 +43,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static com.example.musicplayerv1.App.CHANNEL_ID;
+import static com.example.musicplayerv1.App.SERVICECONNECTION;
 import static com.example.musicplayerv1.App.manager;
 
 public class MusicPlayService extends Service {
@@ -65,6 +66,7 @@ public class MusicPlayService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         try {
+
             url = intent.getStringExtra("streamLink");
             title = intent.getStringExtra("title");
             thumbnail = intent.getStringExtra("thumbnail");
@@ -72,7 +74,6 @@ public class MusicPlayService extends Service {
             tracks = (ArrayList<Track>) intent.getSerializableExtra("tracks");
             position = intent.getIntExtra("position", 0);
             mediaSessionCompat = new MediaSessionCompat(this, "MediaSessionTag");
-
             mediaPlayer = new MediaPlayer();
             mediaPlayer.setDataSource(url);
             mediaPlayer.prepare();
@@ -114,9 +115,8 @@ public class MusicPlayService extends Service {
                             .setSubText("Music")
                             .setContentIntent(pendingIntent)
                             .setPriority(NotificationCompat.PRIORITY_MAX)
-
                             .build();
-                    startForeground(1, notification);
+                    startForeground(1,notification);
                 }
             };
 
@@ -137,12 +137,11 @@ public class MusicPlayService extends Service {
 
     @Override
     public void onDestroy() {
-        if (mediaPlayer.isPlaying())
-            mediaPlayer.stop();
-        mediaPlayer.release();
-        unbindService(serviceConnection);
-        unregisterReceiver(trackBroadcastReceiver);
         super.onDestroy();
+        mediaPlayer.release();
+        getApplicationContext().unbindService(serviceConnection);
+        this.stopForeground(true);
+        unregisterReceiver(trackBroadcastReceiver);
     }
 
     @Nullable
@@ -163,7 +162,12 @@ public class MusicPlayService extends Service {
         mediaPlayer.pause();
 
     }
-
+    public void release(){
+        mediaPlayer.release();
+    }
+    public MediaPlayer getMediaPlayer(){
+        return mediaPlayer;
+    }
     public int getDuration() {
         return mediaPlayer.getDuration();
     }
@@ -191,6 +195,7 @@ public class MusicPlayService extends Service {
         }
     }
 
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -205,7 +210,7 @@ public class MusicPlayService extends Service {
         @Override
         public void onReceive(final Context context, Intent intent) {
             if(!PlayMusic.isAlive) {
-                stopService(new Intent(getApplicationContext(), MusicPlayService.class));
+                stopSelf();
                 String channelNameStr = intent.getStringExtra("channelName");
                 String trackNameStr = intent.getStringExtra("Title");
                 long duration = intent.getLongExtra("duration", 0L);
@@ -216,7 +221,6 @@ public class MusicPlayService extends Service {
                 intent1.putExtra("title", trackNameStr);
                 intent1.putExtra("thumbnail", urlThumbnail);
                 intent1.putExtra("author", channelNameStr);
-
                 serviceConnection = new ServiceConnection() {
                     @Override
                     public void onServiceConnected(ComponentName name, IBinder service) {

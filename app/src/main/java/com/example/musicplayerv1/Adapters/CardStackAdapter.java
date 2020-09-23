@@ -1,5 +1,6 @@
 package com.example.musicplayerv1.Adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,15 +12,17 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.musicplayerv1.Model.StackModel;
+import com.example.musicplayerv1.Model.Playlist;
+
 import com.example.musicplayerv1.R;
 
-import java.util.List;
+import java.util.ArrayList;
+
 
 public class CardStackAdapter extends RecyclerView.Adapter<CardStackAdapter.ImageHolder> {
-    List<StackModel> models;
+    ArrayList<Playlist> models;
     Context context;
-    public CardStackAdapter(List<StackModel> models, Context context){
+    public CardStackAdapter(ArrayList<Playlist> models, Context context){
         this.models=models;
         this.context =context;
     }
@@ -30,11 +33,12 @@ public class CardStackAdapter extends RecyclerView.Adapter<CardStackAdapter.Imag
         return new ImageHolder(v);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull ImageHolder holder, int position) {
-        Glide.with(context).load(models.get(position).getUrlThumbnail()).into(holder.thumbnail);
+        Glide.with(context).load(models.get(position).getUrlImage()).into(holder.thumbnail);
         holder.name.setText(models.get(position).getTitle());
-        holder.noOfTracks.setText(models.get(position).getNumberOfTracks());
+        holder.noOfTracks.setText(String.valueOf(models.get(position).getTotalTracks()));
     }
 
     @Override

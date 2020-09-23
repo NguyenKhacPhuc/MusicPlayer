@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface LocalDataSource<T> {
     public List<T> getAll();
-    public List<T> getA(String id);
+    public T getA(String id);
     public void deleteA(String id);
     public void insert(T t);
 

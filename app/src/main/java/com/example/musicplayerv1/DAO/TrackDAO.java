@@ -14,7 +14,7 @@ public interface TrackDAO {
     @Query("Select * from Track")
     public List<Track> getAllTracks();
     @Query("Select * from Track where trackId  = :trackId")
-    public List<Track> getATrack(String trackId);
+    public Track getATrack(String trackId);
     @Query("Delete from Track where trackId = :trackId")
     public void deleteATrack(String trackId);
     @Insert(onConflict = OnConflictStrategy.REPLACE)

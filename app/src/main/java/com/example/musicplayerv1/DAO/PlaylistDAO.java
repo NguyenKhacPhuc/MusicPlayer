@@ -15,14 +15,14 @@ import java.util.List;
 public interface PlaylistDAO {
     @Query("Select * from Playlist")
     public List<Playlist> getAllPlaylist();
-    @Query("Select * from Playlist where ID  = :trackId")
-    public List<Playlist> getAPlaylist(String trackId);
-    @Query("Delete from Playlist where ID = :trackId")
-    public void deleteAPlaylist(String trackId);
+    @Query("Select * from Playlist where title  = :name")
+    public Playlist getAPlaylist(String name);
+    @Query("Delete from Playlist where title = :name")
+    public void deleteAPlaylist(String name);
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public void insertAPlaylist(Playlist playlist);
-    @Query("Update Playlist set title = :replacement where ID = :id ")
-    public void updateNameOfThePlaylist(String id,String replacement);
-    @Query("Update Playlist set url = :url where ID = :id ")
-    public void updateUrlThumbnailOfThePlaylist(String id,String url);
+    @Query("Update Playlist set title = :replacement where title = :oldname ")
+    public void updateNameOfThePlaylist(String oldname,String replacement);
+    @Query("Update Playlist set url = :url where title = :name ")
+    public void updateUrlThumbnailOfThePlaylist(String name,String url);
 }

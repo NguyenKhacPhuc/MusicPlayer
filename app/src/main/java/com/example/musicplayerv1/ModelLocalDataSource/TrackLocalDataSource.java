@@ -19,7 +19,7 @@ public class TrackLocalDataSource implements LocalDataSource<Track> {
     }
 
     @Override
-    public List<Track> getA(String id) {
+    public Track getA(String id) {
         return trackDAO.getATrack(id);
     }
 
@@ -35,7 +35,9 @@ public class TrackLocalDataSource implements LocalDataSource<Track> {
     public void updateLike(boolean like){
         trackDAO.updateLike(like);
     }
-
+    public void updateStreamLink(String streamLink){
+        trackDAO.updateStreamLink(streamLink);
+    }
     public void updateDownload(boolean download){
         trackDAO.updateDownload(download);
     }

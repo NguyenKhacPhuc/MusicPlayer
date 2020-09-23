@@ -2,6 +2,7 @@ package com.example.musicplayerv1.MainFragment;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -58,6 +59,7 @@ public class HomeFragment extends Fragment implements IItemPreviewClick, IModelO
     RequestQueue requestQueue;
     ArrayList<Track> tracks;
     ConstraintLayout homeFragment;
+    public static final int position = 1;
 
 
     View v;
@@ -73,7 +75,6 @@ public class HomeFragment extends Fragment implements IItemPreviewClick, IModelO
 
             addModelData();
 
-
         return v;
     }
     void initView(){
@@ -88,13 +89,11 @@ public class HomeFragment extends Fragment implements IItemPreviewClick, IModelO
     @Override
     public void onItemClick(int position,ArrayList<Track> tracks) {
         Objects.requireNonNull(getActivity()).stopService(new Intent(getContext(),MusicPlayService.class));
-
-//        Injection.getProvidedTrackLocalStorage(getContext()).insert(tracks.get(position));
-                Intent intent = new Intent(getContext(),PlayMusic.class);
+        Intent intent = new Intent(getContext(),PlayMusic.class);
         intent.putExtra("tracks", (Serializable) tracks);
         intent.putExtra("position", position);
         intent.putExtra("playPoint", 0L);
-                Objects.requireNonNull(getContext()).startActivity(intent);
+        Objects.requireNonNull(getContext()).startActivity(intent);
 
     }
 

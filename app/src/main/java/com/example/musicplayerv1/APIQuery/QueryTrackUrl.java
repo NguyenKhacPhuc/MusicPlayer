@@ -7,8 +7,6 @@ import android.util.SparseArray;
 import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
-import com.example.musicplayerv1.Common.ProgressDialogSingleton;
-import com.example.musicplayerv1.Constant;
 import com.example.musicplayerv1.Interfaces.IPassUrl;
 import com.example.musicplayerv1.Model.Track;
 import com.example.musicplayerv1.YoutubeConfig.YoutubeConstant;
@@ -48,7 +46,7 @@ public class  QueryTrackUrl  {
                     Track track = new Track(videoId, title, author, description, duration, finalUrl);
                     iPassUrl.getUr(track);
                 }catch (NullPointerException n){
-                    n.printStackTrace();
+                    Toast.makeText(context,"null here",Toast.LENGTH_SHORT).show();
                 }
             }
         }.extract(trackUrl,true,true);

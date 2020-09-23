@@ -17,7 +17,7 @@ public class PlaylistLocalDataSource implements LocalDataSource<Playlist> {
     }
 
     @Override
-    public List<Playlist> getA(String id) {
+    public Playlist getA(String id) {
         return playlistDAO.getAPlaylist(id);
     }
 

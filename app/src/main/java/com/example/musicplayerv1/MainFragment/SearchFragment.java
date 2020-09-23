@@ -46,6 +46,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener, II
     ImageView search_ic;
     RequestQueue requestQueue;
     View v;
+    public static final int position = 3;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

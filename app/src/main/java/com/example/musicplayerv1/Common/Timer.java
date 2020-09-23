@@ -53,7 +53,7 @@ public class Timer {
 
     ) {
         if(isNotRewind){
-            index++;
+            ++index;
         }
 
 
@@ -83,7 +83,7 @@ public class Timer {
             @Override
             public void onFinish() {
 
-                if (!tempTracks.isEmpty() && context != null) {
+                if (!tempTracks.isEmpty() && context != null && index< tempTracks.size()) {
                     final Track track = tempTracks.get(index);
                     if(track.isDownloaded()){
                         sendBroadcast(track.getStreamLink(),track.getUrlThumbnail(),track.getDuration(),track.getDescription(),track.getTrackName(),track.getArtist());
