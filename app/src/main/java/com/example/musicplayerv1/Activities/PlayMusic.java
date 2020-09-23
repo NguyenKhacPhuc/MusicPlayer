@@ -95,11 +95,15 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
     long milDuration;
     ImageView heart;
     Timer timer;
+    static ServiceConnection serviceConnection;
+    ServiceConnection serviceConnection1;
+    MusicPlayService musicPlayService1;
+    static MusicPlayService musicPlayService;
     long intentCurrentMil;
     ImageButton next;
     ImageButton previous;
     ImageButton stopPlay;
-    public  static ArrayList<Track> tracks;
+    public static ArrayList<Track> tracks;
     QueryTrackUrl queryTrackUrl;
     RequestQueue requestQueue;
     ExecutorService executorService;
@@ -110,8 +114,8 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
     ImageButton repeatBtn;
     boolean isRepeat;
     public static int position;
-    static boolean isBind = false;
-  public static boolean isAlive;
+    public static boolean isBind = false;
+    public static boolean isAlive;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -136,7 +140,11 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
         //handle receive intent
 //                unbindService(SERVICECONNECTION);
 
-                triggerMusic(position, intentCurrentMil);
+        if (musicPlayService != null) {
+            musicPlayService.release();
+        }
+
+        triggerMusic(position, intentCurrentMil);
 
         heart.setOnClickListener(this);
         stopPlay.setOnClickListener(this);
@@ -212,22 +220,23 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
                 break;
             case R.id.next:
                 //TODO: next track
-                MUSICPLAYSERVICE.release();
-                    getApplicationContext().stopService(new Intent(getApplicationContext(), MusicPlayService.class));
-                    position += 1;
-                    triggerMusic(position, 0L);
+                musicPlayService.release();
+
+                getApplicationContext().stopService(new Intent(getApplicationContext(), MusicPlayService.class));
+                position += 1;
+                triggerMusic(position, 0L);
 
                 break;
             case R.id.play:
                 //TODO: pause/play track
-                if (MUSICPLAYSERVICE.isPlaying()) {
-                    MUSICPLAYSERVICE.paused();
+                if (musicPlayService.isPlaying()) {
+                    musicPlayService.paused();
                     timer.cancel();
                     stopPlay.setImageResource(R.drawable.play);
                     status.setText("PAUSED");
 
                 } else {
-                    MUSICPLAYSERVICE.play();
+                    musicPlayService.play();
                     stopPlay.setImageResource(R.drawable.pause);
                     status.setText("PLAYING");
 
@@ -239,24 +248,23 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
                 break;
             case R.id.previous:
                 //TODO: move to previous track
-                MUSICPLAYSERVICE.release();
+                musicPlayService.release();
                 stopService(new Intent(getApplicationContext(), MusicPlayService.class));
                 position -= 1;
                 triggerMusic(position, 0L);
                 break;
             case R.id.backBtn:
                 //TODO: move to previous activity
-                startActivity(new Intent(this,MainActivity.class));
+                startActivity(new Intent(this, MainActivity.class));
                 break;
             case R.id.repeatBtn:
-                if(isRepeat){
-                    MUSICPLAYSERVICE.dismissRepeat();
+                if (isRepeat) {
+                    musicPlayService.dismissRepeat();
                     repeatBtn.setImageResource(R.drawable.repeat_24);
                     isRepeat = false;
 
-                }
-                else{
-                    MUSICPLAYSERVICE.repeat();
+                } else {
+                    musicPlayService.repeat();
                     repeatBtn.setImageResource(R.drawable.repeat_one_24);
                     isRepeat = true;
                 }
@@ -294,8 +302,8 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
                 try {
                     BottomSheetFragment bottomSheetDialogFragment = new BottomSheetFragment();
                     bottomSheetDialogFragment.show(getSupportFragmentManager(), "playlist adding");
-                }catch (Exception e){
-                    Toast.makeText(this,e.getMessage(),Toast.LENGTH_SHORT).show();
+                } catch (Exception e) {
+                    Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
                 break;
             case R.id.share:
@@ -307,7 +315,19 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
     }
 
     void playMusic() {
+        serviceConnection = new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                MusicPlayService.MediaBinder mediaBinder = (MusicPlayService.MediaBinder) service;
+                musicPlayService = mediaBinder.getService();
+                musicPlayService.play();
+            }
 
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+
+            }
+        };
         Intent intent = new Intent(getApplicationContext(), MusicPlayService.class);
         intent.putExtra("streamLink", streamLink);
         intent.putExtra("title", title);
@@ -316,7 +336,7 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
         intent.putExtra("tracks", (Serializable) tracks);
         intent.putExtra("position", position);
         getApplicationContext().startService(intent);
-        getApplicationContext().bindService(new Intent(getApplicationContext(),MusicPlayService.class),SERVICECONNECTION, Context.BIND_AUTO_CREATE);
+        getApplicationContext().bindService(new Intent(getApplicationContext(), MusicPlayService.class), serviceConnection, Context.BIND_AUTO_CREATE);
         isBind = true;
 
     }
@@ -335,7 +355,7 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
 
         DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
         assert manager != null;
-         manager.enqueue(request);
+        manager.enqueue(request);
     }
 
     @Override
@@ -351,7 +371,7 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
 
             timer.countDown(seekBar, milProgress, currentDuration, durationBegin, durationFinish, requestQueue, false);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                MUSICPLAYSERVICE.seekTo(milProgress);
+                musicPlayService.seekTo(milProgress);
             }
         }
     }
@@ -370,7 +390,7 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
 
         @Override
         public void onReceive(final Context context, Intent intent) {
-            stopService(new Intent(getApplicationContext(), MusicPlayService.class));
+            stopService(new Intent(getApplicationContext(),MusicPlayService.class));
             String channelNameStr = intent.getStringExtra("channelName");
             String trackNameStr = intent.getStringExtra("Title");
             long duration = intent.getLongExtra("duration", 0L);
@@ -384,6 +404,7 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
             Glide.with(getApplicationContext()).load(urlThumbnail).into(thumbnail);
             playMusic();
 
+
         }
     }
 
@@ -395,7 +416,7 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
         intentFilter.addAction("Pass Track to Home Fragment");
         trackBroadcastReceiver = new TrackBroadcastReceiver();
         registerReceiver(trackBroadcastReceiver, intentFilter);
-        isAlive =true;
+        isAlive = true;
 
     }
 
@@ -453,8 +474,12 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//        getApplicationContext().unbindService(SERVICECONNECTION);
         unregisterReceiver(trackBroadcastReceiver);
         isAlive = false;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
     }
 }

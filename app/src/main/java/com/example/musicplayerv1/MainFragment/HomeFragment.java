@@ -63,21 +63,23 @@ public class HomeFragment extends Fragment implements IItemPreviewClick, IModelO
 
 
     View v;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-         v = inflater.inflate(R.layout.home_frag,container,false);
-            initView();
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(),RecyclerView.VERTICAL,false);
-        mainReAdapter = new MainReAdapter(getContext(),models,this);
+        v = inflater.inflate(R.layout.home_frag, container, false);
+        initView();
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false);
+        mainReAdapter = new MainReAdapter(getContext(), models, this);
         mainRe.setLayoutManager(linearLayoutManager);
         mainRe.setAdapter(mainReAdapter);
 
-            addModelData();
+        addModelData();
 
         return v;
     }
-    void initView(){
+
+    void initView() {
         requestQueue = Volley.newRequestQueue(getContext());
         models = new ArrayList<>();
         mainRe = v.findViewById(R.id.mainRe);
@@ -87,9 +89,10 @@ public class HomeFragment extends Fragment implements IItemPreviewClick, IModelO
     }
 
     @Override
-    public void onItemClick(int position,ArrayList<Track> tracks) {
-        Objects.requireNonNull(getActivity()).stopService(new Intent(getContext(),MusicPlayService.class));
-        Intent intent = new Intent(getContext(),PlayMusic.class);
+    public void onItemClick(int position, ArrayList<Track> tracks) {
+        Objects.requireNonNull(getActivity()).stopService(new Intent(getContext(), MusicPlayService.class));
+
+        Intent intent = new Intent(getContext(), PlayMusic.class);
         intent.putExtra("tracks", (Serializable) tracks);
         intent.putExtra("position", position);
         intent.putExtra("playPoint", 0L);
@@ -97,23 +100,23 @@ public class HomeFragment extends Fragment implements IItemPreviewClick, IModelO
 
     }
 
-    void addModelData(){
+    void addModelData() {
         final ModelQuery modelQuery = new ModelQuery();
         final ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor .execute(new Runnable() {
+        executor.execute(new Runnable() {
             @Override
             public void run() {
                 modelQuery.getAllModel(new ICallBackModel() {
                     @Override
                     public void callBackModels(final ArrayList<Model> multipleModels) {
 
-                        for(int i = 0; i <multipleModels.size();i++) {
+                        for (int i = 0; i < multipleModels.size(); i++) {
                             executor.execute(new YoutubeModelQuery(models, mainReAdapter, multipleModels.get(i), HomeFragment.this, requestQueue) {
                             });
                         }
                         executor.shutdown();
-            }
-        });
+                    }
+                });
             }
         });
     }
@@ -123,9 +126,9 @@ public class HomeFragment extends Fragment implements IItemPreviewClick, IModelO
     public void modelOnClick(final ArrayList<Track> tracks) {
         Collections.shuffle(tracks);
         this.tracks = tracks;
-        Intent intent = new Intent(getContext(),PlayMusic.class);
-        intent.putExtra("tracks", (Serializable)tracks);
-        intent.putExtra("position",0);
+        Intent intent = new Intent(getContext(), PlayMusic.class);
+        intent.putExtra("tracks", (Serializable) tracks);
+        intent.putExtra("position", 0);
         Objects.requireNonNull(getContext()).startActivity(intent);
 
     }

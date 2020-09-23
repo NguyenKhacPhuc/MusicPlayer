@@ -42,17 +42,16 @@ public class YoutubeModelQuery implements Runnable {
     @Override
     public void run() {
         String url = YoutubeConstant.SCHEME
-                +YoutubeConstant.PLAYLIST_ITEM_QUERY
-                +YoutubeConstant.PART
-                +"snippet"
-                +YoutubeConstant.PLAYLIST_ID
-                +model.getIdList()
-                +YoutubeConstant.KEY
-                +YoutubeConstant.API_KEY
-                +"&maxResults=10"
-               ;
+                + YoutubeConstant.PLAYLIST_ITEM_QUERY
+                + YoutubeConstant.PART
+                + "snippet"
+                + YoutubeConstant.PLAYLIST_ID
+                + model.getIdList()
+                + YoutubeConstant.KEY
+                + YoutubeConstant.API_KEY
+                + "&maxResults=10";
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET
-                ,url,null, new Response.Listener<JSONObject>() {
+                , url, null, new Response.Listener<JSONObject>() {
 
             @Override
             public void onResponse(JSONObject response) {
@@ -60,7 +59,7 @@ public class YoutubeModelQuery implements Runnable {
 
                     JSONArray items = response.getJSONArray("items");
                     tracks.clear();
-                    for (int i = 0; i < items.length();i++) {
+                    for (int i = 0; i < items.length(); i++) {
                         JSONObject jsonObject = (JSONObject) items.get(i);
                         JSONObject snippet = jsonObject.getJSONObject("snippet");
                         JSONObject resourceId = snippet.getJSONObject("resourceId");
@@ -70,7 +69,7 @@ public class YoutubeModelQuery implements Runnable {
                         JSONObject defaultThumb = thumbnails.getJSONObject("high");
                         String thumbnailUrl = defaultThumb.getString("url");
                         String id = resourceId.getString("videoId");
-                        Track track = new Track(id,trackName, channelTitle,thumbnailUrl);
+                        Track track = new Track(id, trackName, channelTitle, thumbnailUrl);
                         tracks.add(track);
                     }
                     model.setTracks(tracks);

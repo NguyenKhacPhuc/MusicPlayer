@@ -116,7 +116,7 @@ public class MusicPlayService extends Service {
                             .setContentIntent(pendingIntent)
                             .setPriority(NotificationCompat.PRIORITY_MAX)
                             .build();
-                    startForeground(1,notification);
+                    startForeground(1, notification);
                 }
             };
 
@@ -135,12 +135,12 @@ public class MusicPlayService extends Service {
         return super.onUnbind(intent);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onDestroy() {
         super.onDestroy();
         mediaPlayer.release();
-        getApplicationContext().unbindService(serviceConnection);
-        this.stopForeground(true);
+        stopForeground(STOP_FOREGROUND_REMOVE);
         unregisterReceiver(trackBroadcastReceiver);
     }
 
@@ -162,12 +162,11 @@ public class MusicPlayService extends Service {
         mediaPlayer.pause();
 
     }
-    public void release(){
-        mediaPlayer.release();
+
+    public void release() {
+        mediaPlayer.stop();
     }
-    public MediaPlayer getMediaPlayer(){
-        return mediaPlayer;
-    }
+
     public int getDuration() {
         return mediaPlayer.getDuration();
     }
@@ -176,14 +175,16 @@ public class MusicPlayService extends Service {
         return mediaPlayer.isPlaying();
     }
 
-    public void repeat(){
+    public void repeat() {
         mediaPlayer.setLooping(true);
     }
-    public void dismissRepeat(){
-        if(mediaPlayer.isLooping()){
+
+    public void dismissRepeat() {
+        if (mediaPlayer.isLooping()) {
             mediaPlayer.setLooping(false);
         }
     }
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void seekTo(long milisec) {
         mediaPlayer.seekTo(milisec, MediaPlayer.SEEK_CLOSEST);
@@ -209,14 +210,14 @@ public class MusicPlayService extends Service {
 
         @Override
         public void onReceive(final Context context, Intent intent) {
-            if(!PlayMusic.isAlive) {
+            if (!PlayMusic.isAlive) {
                 stopSelf();
                 String channelNameStr = intent.getStringExtra("channelName");
                 String trackNameStr = intent.getStringExtra("Title");
                 long duration = intent.getLongExtra("duration", 0L);
                 String urlThumbnail = intent.getStringExtra("urlThumbnail");
                 String streamLink = intent.getStringExtra("streamLink");
-                Intent intent1 = new Intent(getApplicationContext(), MusicPlayService.class);
+                Intent intent1 = new Intent(MusicPlayService.this, MusicPlayService.class);
                 intent1.putExtra("streamLink", streamLink);
                 intent1.putExtra("title", trackNameStr);
                 intent1.putExtra("thumbnail", urlThumbnail);

@@ -24,8 +24,7 @@ import com.example.musicplayerv1.Model.Track;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Random;
+
 
 public class Timer {
     long temp;
@@ -37,7 +36,7 @@ public class Timer {
     Context context;
 
     public Timer(final ArrayList<Track> tracks
-            , final Context context,int index) {
+            , final Context context, int index) {
         this.tempTracks = tracks;
         this.context = context;
         this.index = index;
@@ -49,15 +48,15 @@ public class Timer {
             , final TextView start
             , final TextView end
             , final RequestQueue requestQueue
-            ,boolean isNotRewind
+            , boolean isNotRewind
 
     ) {
-        if(isNotRewind){
+        if (isNotRewind) {
             ++index;
         }
 
 
-        seekbar.setProgress((int) (currentProgress/1000));
+        seekbar.setProgress((int) (currentProgress / 1000));
         temp = duration;
         currentTemp = currentProgress;
 
@@ -70,10 +69,10 @@ public class Timer {
         countDownTimer = new MyCountDownTimer(duration, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
-                int current =seekbar.getProgress();
+                int current = seekbar.getProgress();
                 temp = temp - 1000;
                 currentTemp = currentTemp + 1000;
-                seekbar.setProgress(current+1);
+                seekbar.setProgress(current + 1);
                 String strDuration = Converting.convertToSecond(temp);
                 String strCurrent = Converting.convertToSecond(currentTemp);
                 start.setText(strCurrent);
@@ -83,27 +82,27 @@ public class Timer {
             @Override
             public void onFinish() {
 
-                if (!tempTracks.isEmpty() && context != null && index< tempTracks.size()) {
+                if (!tempTracks.isEmpty() && context != null && index < tempTracks.size()) {
                     final Track track = tempTracks.get(index);
-                    if(track.isDownloaded()){
-                        sendBroadcast(track.getStreamLink(),track.getUrlThumbnail(),track.getDuration(),track.getDescription(),track.getTrackName(),track.getArtist());
+                    if (track.isDownloaded()) {
+                        sendBroadcast(track.getStreamLink(), track.getUrlThumbnail(), track.getDuration(), track.getDescription(), track.getTrackName(), track.getArtist());
                     }
-                    QueryTrackUrl queryTrackUrl = new QueryTrackUrl(track.getId(),requestQueue,context);
+                    QueryTrackUrl queryTrackUrl = new QueryTrackUrl(track.getId(), requestQueue, context);
                     queryTrackUrl.returnUrl(new IPassUrl() {
                         @Override
                         public void getUr(Track url) {
-                            sendBroadcast(url.getStreamLink(),track.getUrlThumbnail(),url.getDuration(),track.getDescription(),track.getTrackName(),track.getArtist());
-                            iDurationCallBack.passDuration(url.getDuration(),index);
+                            sendBroadcast(url.getStreamLink(), track.getUrlThumbnail(), url.getDuration(), track.getDescription(), track.getTrackName(), track.getArtist());
+                            iDurationCallBack.passDuration(url.getDuration(), index);
 
                         }
                     });
                 }
                 iDurationCallBack = new IDurationCallBack() {
                     @Override
-                    public void passDuration(long duration,int index) {
-                            long milDuration = duration *1000;
-                            int max = (int)duration;
-                            seekbar.setMax(max);
+                    public void passDuration(long duration, int index) {
+                        long milDuration = duration * 1000;
+                        int max = (int) duration;
+                        seekbar.setMax(max);
 //                            temp= milDuration;
 //                            currentTemp = 0;
 //                            current = 0;
@@ -112,26 +111,28 @@ public class Timer {
 //                        countDownTimer.setMillisInFuture(milDuration);
 //                        countDownTimer.setCountdownInterval(1000);
 //                        countDownTimer.start();
-                            countDown(seekbar,0,milDuration,start,end,requestQueue,true);
+                        countDown(seekbar, 0, milDuration, start, end, requestQueue, true);
 
                     }
                 };
             }
         }.start();
     }
-    private void sendBroadcast(String streamLink,String urlThumbnail,long duration,String description,String trackName,String artist){
+
+    private void sendBroadcast(String streamLink, String urlThumbnail, long duration, String description, String trackName, String artist) {
         Intent intent = new Intent();
         intent.setAction("Pass Track to Home Fragment");
         intent.putExtra("streamLink", streamLink);
         intent.putExtra("urlThumbnail", urlThumbnail);
         intent.putExtra("duration", duration);
         intent.putExtra("description", description);
-        intent.putExtra("channelName", trackName);
-        intent.putExtra("Title",artist);
-        intent.putExtra("tracks", (Serializable)tempTracks);
+        intent.putExtra("channelName", artist);
+        intent.putExtra("Title", trackName);
+        intent.putExtra("tracks", (Serializable) tempTracks);
         context.sendBroadcast(intent);
     }
-    public void cancel(){
+
+    public void cancel() {
         countDownTimer.cancel();
     }
 }

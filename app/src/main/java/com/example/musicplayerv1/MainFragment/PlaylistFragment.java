@@ -45,38 +45,39 @@ public class PlaylistFragment extends Fragment implements IItemPreviewClick, IPl
     public static final int position = 3;
     ExecutorService executorService;
     View v;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-         v = inflater.inflate(R.layout.playlist_frag,container,false);
-         init();
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(),RecyclerView.VERTICAL,false);
-        LinearLayoutManager linearLayoutManager2 = new LinearLayoutManager(getContext(),RecyclerView.HORIZONTAL,false);
+        v = inflater.inflate(R.layout.playlist_frag, container, false);
+        init();
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false);
+        LinearLayoutManager linearLayoutManager2 = new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false);
         playlist_re.setLayoutManager(linearLayoutManager);
         recentPlay.setLayoutManager(linearLayoutManager2);
-        final PreviewAdapter recentPlayAdapter = new PreviewAdapter(getContext(),recentTracks,this);
-        final PlaylistAdapter playlistAdapter = new PlaylistAdapter(playlists,getContext(),this);
+        final PreviewAdapter recentPlayAdapter = new PreviewAdapter(getContext(), recentTracks, this);
+        final PlaylistAdapter playlistAdapter = new PlaylistAdapter(playlists, getContext(), this);
         recentPlay.setAdapter(recentPlayAdapter);
         playlist_re.setAdapter(playlistAdapter);
-       executorService.execute(new Runnable() {
-           @Override
-           public void run() {
-               recentTracks.clear();
-               recentTracks.addAll(Injection.getProvidedTrackLocalStorage(getContext()).getAll());
-               Collections.reverse(recentTracks);
-               Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
-                   @Override
-                   public void run() {
-                       recentPlayAdapter.notifyDataSetChanged();
-                   }
-               });
-           }
-       });
+        executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                recentTracks.clear();
+                recentTracks.addAll(Injection.getProvidedTrackLocalStorage(getContext()).getAll());
+                Collections.reverse(recentTracks);
+                Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        recentPlayAdapter.notifyDataSetChanged();
+                    }
+                });
+            }
+        });
         executorService.execute(new Runnable() {
             @Override
             public void run() {
                 playlists.clear();
-                playlists.addAll( Injection.getProvidedPlaylistLocalStorage(getContext()).getAll());
+                playlists.addAll(Injection.getProvidedPlaylistLocalStorage(getContext()).getAll());
                 Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -85,9 +86,10 @@ public class PlaylistFragment extends Fragment implements IItemPreviewClick, IPl
                 });
             }
         });
-        return  v;
+        return v;
     }
-    void init(){
+
+    void init() {
         playlist_re = v.findViewById(R.id.playlist_rec);
         recentPlay = v.findViewById(R.id.recent_re_playlist);
         playlists = new ArrayList<>();
@@ -101,34 +103,37 @@ public class PlaylistFragment extends Fragment implements IItemPreviewClick, IPl
     public void onItemClick(int position, ArrayList<Track> tracks) {
         Objects.requireNonNull(getActivity()).stopService(new Intent(getContext(), MusicPlayService.class));
         Intent intent = new Intent(getContext(), PlayMusic.class);
-        intent.putExtra("tracks", (Serializable)tracks);
-        intent.putExtra("position",position);
+        intent.putExtra("tracks", (Serializable) tracks);
+        intent.putExtra("position", position);
         Objects.requireNonNull(getContext()).startActivity(intent);
     }
 
     @Override
     public void onPlaylistClick(final int position) {
-        Playlist playlist = playlists.get(position);
-        final String name = playlist.getTitle();
-        executorService.execute(new Runnable() {
-            @Override
-            public void run() {
-                containers.clear();
-                containers.addAll ( Injection.getProvidedContainerLocalStorage(getContext()).getTracks(name));
-                for(final Container container : containers){
-                    executorService.execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            tracks.add(Injection.getProvidedTrackLocalStorage(getContext()).getA(container.getTrackID()));
-                        }
-                    });
+        try {
+            Playlist playlist = playlists.get(position);
+            final String name = playlist.getTitle();
+            executorService.execute(new Runnable() {
+                @Override
+                public void run() {
+                    containers.clear();
+                    containers.addAll(Injection.getProvidedContainerLocalStorage(getContext()).getTracks(name));
+                    for (final Container container : containers) {
+                        executorService.execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                tracks.add(Injection.getProvidedTrackLocalStorage(getContext()).getA(container.getTrackID()));
+                            }
+                        });
+                    }
+                    Intent intent = new Intent(getContext(), PlaylistActivity.class);
+                    intent.putExtra("tracks", (Serializable) tracks);
+                    intent.putExtra("position", position);
+                    startActivity(intent);
                 }
-                Intent intent = new Intent(getContext(), PlaylistActivity.class);
-                intent.putExtra("tracks", (Serializable)tracks);
-                intent.putExtra("position",position);
-                startActivity(intent);
-            }
-        });
-
+            });
+        } catch (Exception e) {
+            Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
 }
