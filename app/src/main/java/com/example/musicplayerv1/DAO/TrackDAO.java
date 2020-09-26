@@ -21,8 +21,11 @@ public interface TrackDAO {
     public void insertATrack(Track track);
     @Query("Update Track set isLike =:like")
     public void updateLike(boolean like);
-    @Query("Update Track set downloaded =:download")
-    public void updateDownload(boolean download);
-    @Query("Update Track set streamLink =:streamLink")
-    public void updateStreamLink(String streamLink);
+    @Query("Update Track set downloaded =:download where trackName = :trackName")
+    public void updateDownload(String trackName,boolean download);
+    @Query("Update Track set streamLink =:streamLink where trackName =:trackName")
+    public void updateStreamLink(String trackName,String streamLink);
+    @Query("Select downloaded from Track where trackName =:trackName")
+    public List<Boolean> getDownloaded(String trackName);
+
 }

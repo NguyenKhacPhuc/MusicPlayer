@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.musicplayerv1.Activities.PlayMusic;
 import com.example.musicplayerv1.Adapters.CardStackAdapter;
 import com.example.musicplayerv1.Injection;
+import com.example.musicplayerv1.Interfaces.IPlaylistAddingClick;
 import com.example.musicplayerv1.Model.Container;
 import com.example.musicplayerv1.Model.Playlist;
 
@@ -40,13 +41,14 @@ import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class BottomSheetFragment extends BottomSheetDialogFragment implements View.OnClickListener {
+public class BottomSheetFragment extends BottomSheetDialogFragment implements View.OnClickListener, IPlaylistAddingClick {
     View v;
     RecyclerView cardStackView;
     LinearLayoutManager cardStackLayoutManager;
     CardStackAdapter cardStackAdapter;
     ExecutorService executorService;
     Button create;
+    Dialog dialog;
     ArrayList<Playlist> models;
     @Nullable
     @Override
@@ -56,7 +58,6 @@ public class BottomSheetFragment extends BottomSheetDialogFragment implements Vi
 
         create.setOnClickListener(this);
         cardStackView.setLayoutManager(cardStackLayoutManager);
-        cardStackView.setAdapter(cardStackAdapter);
         addData();
         return v;
     }
@@ -66,11 +67,11 @@ public class BottomSheetFragment extends BottomSheetDialogFragment implements Vi
             @Override
             public void run() {
                 models.clear();
-               models.addAll(Injection.getProvidedPlaylistLocalStorage(getContext()).getAll());
+                models.addAll(Injection.getProvidedPlaylistLocalStorage(getContext()).getAll());
                 Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        cardStackAdapter.notifyDataSetChanged();
+                        cardStackView.setAdapter(cardStackAdapter);
                     }
                 });
             }
@@ -82,14 +83,14 @@ public class BottomSheetFragment extends BottomSheetDialogFragment implements Vi
         create = v.findViewById(R.id.create_btn);
         models = new ArrayList<>();
         executorService = Executors.newSingleThreadExecutor();
-        cardStackAdapter = new CardStackAdapter(models,getContext());
+        cardStackAdapter = new CardStackAdapter(models,getContext(),this);
         cardStackLayoutManager = new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL,false);
     }
 
     @Override
     public void onClick(View v) {
         if(v.getId() == R.id.create_btn){
-            final Dialog dialog = new Dialog(Objects.requireNonNull(getContext()));
+              dialog = new Dialog(Objects.requireNonNull(getContext()));
             dialog.setContentView(R.layout.create_playlist_layout);
 
             final EditText nameOfThePlaylst = dialog.findViewById(R.id.playlist_name);
@@ -99,7 +100,7 @@ public class BottomSheetFragment extends BottomSheetDialogFragment implements Vi
                 @Override
                 public void onClick(View v) {
                     String name = nameOfThePlaylst.getText().toString();
-                    Track track = PlayMusic.tracks.get(PlayMusic.position);
+                    Track track = PlayMusic.getTracks().get(PlayMusic.position);
 
                     final Playlist playlist = new Playlist(name,track.getUrlThumbnail(),0);
 
@@ -112,14 +113,11 @@ public class BottomSheetFragment extends BottomSheetDialogFragment implements Vi
                         @Override
                         public void run() {
                             Injection.getProvidedPlaylistLocalStorage(getContext()).insert(playlist);
-                        }
-                    });
-                    executorService.execute(new Runnable() {
-                        @Override
-                        public void run() {
                             Injection.getProvidedContainerLocalStorage(getContext()).insert(container);
+                            Injection.getProvidedPlaylistLocalStorage(getContext()).updateTotalTrack(playlist.getTitle(),1);
                         }
                     });
+
                     dialog.dismiss();
                 }
             });
@@ -127,11 +125,21 @@ public class BottomSheetFragment extends BottomSheetDialogFragment implements Vi
 
         }
     }
-    static class AddedTrackReceiver extends BroadcastReceiver{
 
-        @Override
-        public void onReceive(Context context, Intent intent) {
+    @Override
+    public void onPlaylistItemAddingClick(final String playlistID) {
+        final Container container = new Container(PlayMusic.getTracks().get(PlayMusic.position).getId(),playlistID);
+        executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                Injection.getProvidedContainerLocalStorage(getContext()).insert(container);
+                int totalTracks = Injection.getProvidedPlaylistLocalStorage(getContext()).getTotalTrack(playlistID);
+               totalTracks += 1;
+               Injection.getProvidedPlaylistLocalStorage(getContext()).updateTotalTrack(playlistID,totalTracks);
+            }
+        });
+       dismiss();
 
-        }
     }
+
 }

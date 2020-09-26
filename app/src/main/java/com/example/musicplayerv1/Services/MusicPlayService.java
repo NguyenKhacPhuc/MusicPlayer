@@ -68,6 +68,7 @@ public class MusicPlayService extends Service {
         try {
 
             url = intent.getStringExtra("streamLink");
+            Log.d("streamLink",url);
             title = intent.getStringExtra("title");
             thumbnail = intent.getStringExtra("thumbnail");
             author = intent.getStringExtra("author");

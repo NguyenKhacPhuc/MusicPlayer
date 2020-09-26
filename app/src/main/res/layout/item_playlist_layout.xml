@@ -3,8 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="80dp"
-    android:background="#BCD1D6F5"
-    android:layout_marginTop="4dp"
+    android:background="@color/mainhthene"
     xmlns:app="http://schemas.android.com/apk/res-auto">
         <de.hdodenhof.circleimageview.CircleImageView
             android:layout_width="50dp"
@@ -28,8 +27,8 @@
             android:typeface="serif"
             />
         <ImageView
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

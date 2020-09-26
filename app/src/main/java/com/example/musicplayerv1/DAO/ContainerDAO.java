@@ -20,6 +20,7 @@ public interface ContainerDAO {
     public void deleteATrack(String trackId);
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     public void insertAContainer(Container container);
-    @Query("Delete from Container where playlistID = :playlistId")
-    public void deleteAPlaylist(String playlistId);
+
+    @Query("Delete from Container where trackID =:trackId and playlistID =:playlistName")
+    public void deleteAContainer(String trackId,String playlistName);
 }

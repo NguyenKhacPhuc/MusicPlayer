@@ -2,6 +2,7 @@ package com.example.musicplayerv1.MainFragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -44,6 +46,7 @@ public class PlaylistFragment extends Fragment implements IItemPreviewClick, IPl
     ArrayList<Container> containers;
     public static final int position = 3;
     ExecutorService executorService;
+     PlaylistAdapter playlistAdapter;
     View v;
 
     @Nullable
@@ -56,9 +59,10 @@ public class PlaylistFragment extends Fragment implements IItemPreviewClick, IPl
         playlist_re.setLayoutManager(linearLayoutManager);
         recentPlay.setLayoutManager(linearLayoutManager2);
         final PreviewAdapter recentPlayAdapter = new PreviewAdapter(getContext(), recentTracks, this);
-        final PlaylistAdapter playlistAdapter = new PlaylistAdapter(playlists, getContext(), this);
+         playlistAdapter = new PlaylistAdapter(playlists, getContext(), this);
         recentPlay.setAdapter(recentPlayAdapter);
         playlist_re.setAdapter(playlistAdapter);
+        new ItemTouchHelper(itemSimpleCallback).attachToRecyclerView(playlist_re);
         executorService.execute(new Runnable() {
             @Override
             public void run() {
@@ -93,6 +97,7 @@ public class PlaylistFragment extends Fragment implements IItemPreviewClick, IPl
         playlist_re = v.findViewById(R.id.playlist_rec);
         recentPlay = v.findViewById(R.id.recent_re_playlist);
         playlists = new ArrayList<>();
+        containers = new ArrayList<>();
         recentTracks = new ArrayList<>();
         tracks = new ArrayList<>();
         executorService = Executors.newSingleThreadExecutor();
@@ -123,17 +128,40 @@ public class PlaylistFragment extends Fragment implements IItemPreviewClick, IPl
                             @Override
                             public void run() {
                                 tracks.add(Injection.getProvidedTrackLocalStorage(getContext()).getA(container.getTrackID()));
+
                             }
                         });
+
                     }
                     Intent intent = new Intent(getContext(), PlaylistActivity.class);
-                    intent.putExtra("tracks", (Serializable) tracks);
+                    intent.putExtra("containers", (Serializable) containers);
                     intent.putExtra("position", position);
+                    intent.putExtra("title",name);
                     startActivity(intent);
+
                 }
             });
         } catch (Exception e) {
             Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
+    ItemTouchHelper.SimpleCallback itemSimpleCallback = new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.LEFT) {
+        @Override
+        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+            return false;
+        }
+
+        @Override
+        public void onSwiped(@NonNull final RecyclerView.ViewHolder viewHolder, int direction) {
+            final String id = playlists.get(viewHolder.getAdapterPosition()).getTitle();
+            playlists.remove(viewHolder.getAdapterPosition());
+            playlistAdapter.notifyItemRemoved(playlists.size());
+            executorService.execute(new Runnable() {
+                @Override
+                public void run() {
+                    Injection.getProvidedPlaylistLocalStorage(getContext()).deleteA(id);
+                }
+            });
+        }
+    };
 }

@@ -36,4 +36,10 @@ public class PlaylistLocalDataSource implements LocalDataSource<Playlist> {
     public void updateThumbnailUrl(String id, String replacement){
         playlistDAO.updateUrlThumbnailOfThePlaylist(id,replacement);
     }
+    public int getTotalTrack(String id){
+        return playlistDAO.selectTotalTracks(id);
+    }
+    public void updateTotalTrack(String id,int totalTracks){
+        playlistDAO.updateTotalTracks(id,totalTracks);
+    }
 }

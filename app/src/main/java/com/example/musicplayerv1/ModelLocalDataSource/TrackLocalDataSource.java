@@ -6,6 +6,7 @@ import com.example.musicplayerv1.DAO.TrackDAO;
 import com.example.musicplayerv1.Interfaces.LocalDataSource;
 import com.example.musicplayerv1.Model.Track;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TrackLocalDataSource implements LocalDataSource<Track> {
@@ -35,10 +36,13 @@ public class TrackLocalDataSource implements LocalDataSource<Track> {
     public void updateLike(boolean like){
         trackDAO.updateLike(like);
     }
-    public void updateStreamLink(String streamLink){
-        trackDAO.updateStreamLink(streamLink);
+    public void updateStreamLink(String trackName,String streamLink){
+        trackDAO.updateStreamLink(trackName,streamLink);
     }
-    public void updateDownload(boolean download){
-        trackDAO.updateDownload(download);
+    public void updateDownload(String trackName,boolean download){
+        trackDAO.updateDownload(trackName,download);
+    }
+    public List<Boolean> getDownloaded(String trackName){
+        return trackDAO.getDownloaded(trackName);
     }
 }

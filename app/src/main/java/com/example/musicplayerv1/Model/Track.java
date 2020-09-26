@@ -12,14 +12,12 @@ import java.io.Serializable;
 public class Track implements Serializable {
     @NonNull
     @PrimaryKey
-
     @ColumnInfo(name = "trackId")
     private  String id;
     @ColumnInfo(name = "artist")
     private String artist;
     @ColumnInfo(name = "trackName")
     private String trackName;
-
     @ColumnInfo(name = "urlThumbnail")
     private String urlThumbnail;
     @ColumnInfo(name="isLike")
@@ -38,7 +36,7 @@ public class Track implements Serializable {
         return description;
     }
 
-    public Track(String id, String artist, String trackName, String urlThumbnail, boolean isLike,String description,String streamLink) {
+    public Track(String id, String artist, String trackName, String urlThumbnail, boolean isLike,String description,long duration,String streamLink) {
         this.id = id;
         this.artist = artist;
         this.trackName = trackName;
@@ -46,6 +44,7 @@ public class Track implements Serializable {
         this.isLike = isLike;
         this.description = description;
         this.streamLink = streamLink;
+        this.duration = duration;
 
     }
     @Ignore

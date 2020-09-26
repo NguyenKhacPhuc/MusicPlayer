@@ -30,11 +30,11 @@ public class ContainerLocalDataSource implements LocalDataSource<Container> {
     public void deleteA(String id) {
             containerDAO.deleteATrack(id);
     }
-    public void deleteAPlaylist(String id){
-        containerDAO.deleteAPlaylist(id);
-    }
     @Override
     public void insert(Container container) {
         containerDAO.insertAContainer(container);
+    }
+    public void deleteAContainer(String trackId, String playlistId){
+        containerDAO.deleteAContainer(trackId,playlistId);
     }
 }

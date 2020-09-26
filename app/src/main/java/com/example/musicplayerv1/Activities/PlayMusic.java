@@ -7,6 +7,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.DownloadManager;
 import android.app.Notification;
@@ -18,6 +19,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -62,6 +64,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -103,7 +106,7 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
     ImageButton next;
     ImageButton previous;
     ImageButton stopPlay;
-    public static ArrayList<Track> tracks;
+    static ArrayList<Track> tracks;
     QueryTrackUrl queryTrackUrl;
     RequestQueue requestQueue;
     ExecutorService executorService;
@@ -116,6 +119,10 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
     public static int position;
     public static boolean isBind = false;
     public static boolean isAlive;
+
+    public static ArrayList<Track> getTracks() {
+        return tracks;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -283,18 +290,24 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
         popup.show();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.Download:
+                int MY_READ_REQUEST = 1;
+                if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                    requestPermissions(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE},MY_READ_REQUEST);
+                }
                 downloadFromUrl(streamLink, "Downloading", title, false);
-                File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC), title);
-                final String path = file.getAbsolutePath();
+                File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC), title+".mp3");
+                final String path = "file://"+file.getPath();
+                Log.d("check", String.valueOf(file.exists()));
                 executorService.execute(new Runnable() {
                     @Override
                     public void run() {
-                        Injection.getProvidedTrackLocalStorage(getApplicationContext()).updateDownload(true);
-                        Injection.getProvidedTrackLocalStorage(getApplicationContext()).updateStreamLink(path);
+                        Injection.getProvidedTrackLocalStorage(getApplicationContext()).updateDownload(title,true);
+                        Injection.getProvidedTrackLocalStorage(getApplicationContext()).updateStreamLink(title,path);
                     }
                 });
                 break;
@@ -351,7 +364,7 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
         } else
             request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
 
-        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_MUSIC, fileName);
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_MUSIC, fileName+".mp3");
 
         DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
         assert manager != null;
@@ -433,43 +446,78 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
     }
 
     private void triggerMusic(final int iDPosition, final long currentMil) {
+        executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                boolean isDownloaded =false;
+                Track track = null;
+                List<Boolean> checks = Injection.getProvidedTrackLocalStorage(getApplicationContext()).getDownloaded(tracks.get(position).getTrackName());
+                if(!checks.isEmpty()) {
+                     isDownloaded = checks.get(0);
+                    track =  Injection.getProvidedTrackLocalStorage(getApplicationContext()).getA(tracks.get(position).getId());
+                }
+                if(isDownloaded){
 
-        if ((tracks.get(position).isDownloaded())) {
-            streamLink = tracks.get(position).getStreamLink();
-            playMusic();
-        } else {
-            queryTrackUrl = new QueryTrackUrl(tracks.get(position).getId(), requestQueue, this);
-            queryTrackUrl.returnUrl(new IPassUrl() {
-                @Override
-                public void getUr(Track url) {
-                    duration = url.getDuration();
+                    streamLink = track.getStreamLink();
+                    duration = track.getDuration();
                     author = tracks.get(position).getArtist();
                     title = tracks.get(iDPosition).getTrackName();
-                    shortDescription = url.getDescription();
+                    shortDescription = track.getDescription();
                     urlThumbnail = tracks.get(position).getUrlThumbnail();
-                    streamLink = url.getStreamLink();
-                    Glide.with(PlayMusic.this).load(urlThumbnail).into(thumbnail);
-                    trackName.setText(title);
-                    channelName.setText(author);
-                    description.setText(shortDescription);
-                    final Track track = new Track(tracks.get(position).getId(), author, title, urlThumbnail, isLiked, shortDescription, streamLink);
-                    executorService.execute(new Runnable() {
+                    runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Injection.getProvidedTrackLocalStorage(getApplicationContext()).insert(track);
+                            Toast.makeText(getApplicationContext(),"downloaded",Toast.LENGTH_SHORT).show();
+                            Glide.with(PlayMusic.this).load(urlThumbnail).into(thumbnail);
+                            trackName.setText(title);
+                            channelName.setText(author);
+                            description.setText(shortDescription);
+                            milDuration = duration * 1000;
+                            seekBar.setMax((int) (milDuration / 1000));
+                            timer.countDown(seekBar, currentMil, milDuration, durationBegin, durationFinish, requestQueue, true);
+                            seekBar.setOnSeekBarChangeListener(PlayMusic.this);
                         }
                     });
-                    milDuration = duration * 1000;
-                    seekBar.setMax((int) (milDuration / 1000));
-                    timer.countDown(seekBar, currentMil, milDuration, durationBegin, durationFinish, requestQueue, true);
-                    seekBar.setOnSeekBarChangeListener(PlayMusic.this);
+
                     playMusic();
                 }
+                else{
+                    queryTrackUrl = new QueryTrackUrl(tracks.get(position).getId(), requestQueue, getApplicationContext());
+                    queryTrackUrl.returnUrl(new IPassUrl() {
+                        @Override
+                        public void getUr(Track url) {
+                            duration = url.getDuration();
+                            author = tracks.get(position).getArtist();
+                            title = tracks.get(iDPosition).getTrackName();
+                            shortDescription = url.getDescription();
+                            urlThumbnail = tracks.get(position).getUrlThumbnail();
+                            streamLink = url.getStreamLink();
+                            Glide.with(PlayMusic.this).load(urlThumbnail).into(thumbnail);
+                            trackName.setText(title);
+                            channelName.setText(author);
+                            description.setText(shortDescription);
+                            final Track track = new Track(tracks.get(position).getId(), author, title, urlThumbnail, isLiked, shortDescription,duration, streamLink);
+                            executorService.execute(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Injection.getProvidedTrackLocalStorage(getApplicationContext()).insert(track);
+                                }
+                            });
+                            milDuration = duration * 1000;
+                            seekBar.setMax((int) (milDuration / 1000));
+                            timer.countDown(seekBar, currentMil, milDuration, durationBegin, durationFinish, requestQueue, true);
+                            seekBar.setOnSeekBarChangeListener(PlayMusic.this);
+                            playMusic();
+                        }
 
-            });
+                    });
+                }
+            }
+        });
+
 
         }
-    }
+
 
     @Override
     protected void onDestroy() {
