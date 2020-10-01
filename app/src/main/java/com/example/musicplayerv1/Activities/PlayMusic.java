@@ -487,6 +487,8 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
                             urlThumbnail = tracks.get(position).getUrlThumbnail();
                             streamLink = url.getStreamLink();
                             Glide.with(PlayMusic.this).load(urlThumbnail).into(thumbnail);
+                            Animation rotate = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotateanim);
+                            thumbnail.startAnimation(rotate);
                             trackName.setText(title);
                             channelName.setText(author);
                             final Track track = new Track(tracks.get(position).getId(), author, title, urlThumbnail, isLiked, shortDescription,duration, streamLink);
