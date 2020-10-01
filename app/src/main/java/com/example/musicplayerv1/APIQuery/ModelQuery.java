@@ -30,8 +30,9 @@ public class ModelQuery {
                         String title = documentSnapshot.getString("Title");
                         String description = documentSnapshot.getString("Description");
                         String tag = documentSnapshot.getString("tag");
+                        String queryId = documentSnapshot.getString("queryId");
                         String idList = documentSnapshot.getString("idList");
-                        Model model = new Model(title,description,tag,idList);
+                        Model model = new Model(title,description,tag,idList,queryId);
                         assert title != null;
                         Log.d("title",title);
                         models.add(model);

@@ -68,12 +68,12 @@ public class HomeFragment extends Fragment implements IItemPreviewClick, IModelO
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         v = inflater.inflate(R.layout.home_frag, container, false);
+
         initView();
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false);
         mainReAdapter = new MainReAdapter(getContext(), models, this);
         mainRe.setLayoutManager(linearLayoutManager);
         mainRe.setAdapter(mainReAdapter);
-
         addModelData();
 
         return v;
@@ -91,11 +91,9 @@ public class HomeFragment extends Fragment implements IItemPreviewClick, IModelO
     @Override
     public void onItemClick(int position, ArrayList<Track> tracks) {
         Objects.requireNonNull(getActivity()).stopService(new Intent(getContext(), MusicPlayService.class));
-
         Intent intent = new Intent(getContext(), PlayMusic.class);
         intent.putExtra("tracks", (Serializable) tracks);
         intent.putExtra("position", position);
-        intent.putExtra("playPoint", 0L);
         Objects.requireNonNull(getContext()).startActivity(intent);
 
     }
@@ -119,13 +117,14 @@ public class HomeFragment extends Fragment implements IItemPreviewClick, IModelO
                 });
             }
         });
+
     }
 
 
     @Override
     public void modelOnClick(final ArrayList<Track> tracks) {
         Collections.shuffle(tracks);
-        this.tracks = tracks;
+        Objects.requireNonNull(getActivity()).stopService(new Intent(getContext(),MusicPlayService.class));
         Intent intent = new Intent(getContext(), PlayMusic.class);
         intent.putExtra("tracks", (Serializable) tracks);
         intent.putExtra("position", 0);
@@ -136,12 +135,12 @@ public class HomeFragment extends Fragment implements IItemPreviewClick, IModelO
     @Override
     public void onStart() {
         super.onStart();
-        active = true;
+
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        active = false;
+
     }
 }

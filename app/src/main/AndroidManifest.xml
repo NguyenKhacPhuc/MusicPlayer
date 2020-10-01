@@ -25,6 +25,7 @@
         <activity android:name=".TestActivity"/>
         <activity android:name=".Activities.PlaylistActivity"/>
         <service android:name=".Services.MusicPlayService"/>
+        <receiver android:name=".Services.MusicPlayService$NotificationBroadCast"/>
     </application>
 
 </manifest>

@@ -9,11 +9,11 @@
     <androidx.appcompat.widget.Toolbar
         android:layout_width="match_parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="@android:color/background_light"
+        android:background="@color/mainhthene"
         android:id="@+id/toolbar"
         android:elevation="8dp"
         android:layout_height="60dp"/>
-    <FrameLayout
+    <androidx.viewpager.widget.ViewPager
         android:id="@+id/fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

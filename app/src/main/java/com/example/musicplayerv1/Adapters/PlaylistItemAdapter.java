@@ -1,6 +1,7 @@
 package com.example.musicplayerv1.Adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,6 +41,7 @@ public class PlaylistItemAdapter extends RecyclerView.Adapter<PlaylistItemAdapte
         holder.artist.setText(tracks.get(position).getArtist());
         holder.title.setText(tracks.get(position).getTrackName());
         Glide.with(context).load(tracks.get(position).getUrlThumbnail()).into(holder.thumbnail);
+
     }
 
     @Override

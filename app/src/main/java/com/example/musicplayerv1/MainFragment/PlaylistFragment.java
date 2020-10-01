@@ -131,7 +131,6 @@ public class PlaylistFragment extends Fragment implements IItemPreviewClick, IPl
 
                             }
                         });
-
                     }
                     Intent intent = new Intent(getContext(), PlaylistActivity.class);
                     intent.putExtra("containers", (Serializable) containers);

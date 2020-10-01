@@ -1,5 +1,6 @@
 package com.example.musicplayerv1.Services;
 
+import android.animation.Animator;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -26,9 +27,12 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
 import com.bumptech.glide.Glide;
+import com.example.musicplayerv1.APIQuery.QueryTrackUrl;
 import com.example.musicplayerv1.Activities.PlayMusic;
+import com.example.musicplayerv1.Common.MyCountDownTimer;
 import com.example.musicplayerv1.Interfaces.ICallBackBitmap;
 import com.example.musicplayerv1.Interfaces.ICallBackModel;
+import com.example.musicplayerv1.Interfaces.IPassUrl;
 import com.example.musicplayerv1.Model.Track;
 import com.example.musicplayerv1.R;
 import com.example.musicplayerv1.TestActivity;
@@ -39,6 +43,7 @@ import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.Timer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -48,18 +53,19 @@ import static com.example.musicplayerv1.App.manager;
 
 public class MusicPlayService extends Service {
     private IBinder iBinder = new MediaBinder();
-    MediaPlayer mediaPlayer;
+    static MediaPlayer mediaPlayer;
     TrackBroadcastReceiver trackBroadcastReceiver;
     ServiceConnection serviceConnection;
     String title;
     String thumbnail;
     String author;
     String url;
-    ArrayList<Track> tracks;
-    int position;
+    static ArrayList<Track> tracks;
+    static int position;
+    static PendingIntent pendingIntentPause;
     MusicPlayService musicPlayService;
     ExecutorService executorService = Executors.newSingleThreadExecutor();
-    ;
+    static Notification notification;
     private MediaSessionCompat mediaSessionCompat;
     private ICallBackBitmap iCallBackBitmap;
 
@@ -79,13 +85,24 @@ public class MusicPlayService extends Service {
             mediaPlayer.setDataSource(url);
             mediaPlayer.prepare();
 
-            Intent notificationIntent = new Intent(getApplicationContext(), PlayMusic.class);
+            final Intent nextSong = new Intent(getApplicationContext(),NotificationBroadCast.class);
+            nextSong.setAction("Next Song");
+            final Intent pause = new Intent(getApplicationContext(),NotificationBroadCast.class);
+            pause.setAction("Pause");
+            final Intent fav = new Intent(getApplicationContext(),NotificationBroadCast.class);
+            fav.setAction("Like");
+           final Intent previous = new Intent(getApplicationContext(),NotificationBroadCast.class);
+            previous.setAction("Previous Song");
+           final Intent notificationIntent = new Intent(getApplicationContext(), PlayMusic.class);
             notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             notificationIntent.putExtra("tracks", (Serializable) tracks);
             notificationIntent.putExtra("position", position);
             notificationIntent.setAction("Start Activity");
             final PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
+            pendingIntentPause = PendingIntent.getBroadcast(this,1,pause,PendingIntent.FLAG_UPDATE_CURRENT);
+            final PendingIntent pendingIntentNext = PendingIntent.getBroadcast(this,2,nextSong,PendingIntent.FLAG_UPDATE_CURRENT);
+            final PendingIntent pendingIntentPrevious = PendingIntent.getBroadcast(this,3,previous,PendingIntent.FLAG_UPDATE_CURRENT);
+            final PendingIntent pendingIntentFav = PendingIntent.getBroadcast(this,4,previous,PendingIntent.FLAG_UPDATE_CURRENT);
             executorService.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -101,20 +118,22 @@ public class MusicPlayService extends Service {
             iCallBackBitmap = new ICallBackBitmap() {
                 @Override
                 public void callBackBitmap(Bitmap bitmap) {
-                    Notification notification = new NotificationCompat.Builder(MusicPlayService.this, CHANNEL_ID)
+
+                     notification = new NotificationCompat.Builder(MusicPlayService.this, CHANNEL_ID)
                             .setSmallIcon(R.drawable.arrow_back_24)
                             .setContentTitle(title)
                             .setContentText(author)
                             .setLargeIcon(bitmap)
-                            .addAction(R.drawable.previous_alt, "Previous", null)
-                            .addAction(R.drawable.pause, "Play", null)
-                            .addAction(R.drawable.next_alt, "Next", null)
-                            .addAction(R.drawable.ic_baseline_favorite_24, "Heart", null)
+                            .addAction(R.drawable.previous_alt, "Previous", pendingIntentPrevious)
+                            .addAction(R.drawable.pause, "Play", pendingIntentPause)
+                            .addAction(R.drawable.next_alt, "Next", pendingIntentNext)
+                            .addAction(R.drawable.ic_baseline_favorite_24, "Heart", pendingIntentFav)
                             .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
                                     .setShowActionsInCompactView(1, 2, 3)
                                     .setMediaSession(mediaSessionCompat.getSessionToken()))
                             .setSubText("Music")
                             .setContentIntent(pendingIntent)
+                            .setAutoCancel(true)
                             .setPriority(NotificationCompat.PRIORITY_MAX)
                             .build();
                     startForeground(1, notification);
@@ -143,6 +162,7 @@ public class MusicPlayService extends Service {
         mediaPlayer.release();
         stopForeground(STOP_FOREGROUND_REMOVE);
         unregisterReceiver(trackBroadcastReceiver);
+
     }
 
     @Nullable
@@ -197,7 +217,6 @@ public class MusicPlayService extends Service {
         }
     }
 
-
     @Override
     public void onCreate() {
         super.onCreate();
@@ -205,24 +224,29 @@ public class MusicPlayService extends Service {
         intentFilter.addAction("Pass Track to Home Fragment");
         trackBroadcastReceiver = new TrackBroadcastReceiver();
         registerReceiver(trackBroadcastReceiver, intentFilter);
+
     }
 
     class TrackBroadcastReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(final Context context, Intent intent) {
-            if (!PlayMusic.isAlive) {
+            if (!PlayMusic.isAlive ) {
                 stopSelf();
                 String channelNameStr = intent.getStringExtra("channelName");
                 String trackNameStr = intent.getStringExtra("Title");
                 long duration = intent.getLongExtra("duration", 0L);
                 String urlThumbnail = intent.getStringExtra("urlThumbnail");
+                int position = intent.getIntExtra("position",0);
                 String streamLink = intent.getStringExtra("streamLink");
+                tracks = (ArrayList<Track>) intent.getSerializableExtra("tracks");
                 Intent intent1 = new Intent(MusicPlayService.this, MusicPlayService.class);
                 intent1.putExtra("streamLink", streamLink);
                 intent1.putExtra("title", trackNameStr);
                 intent1.putExtra("thumbnail", urlThumbnail);
                 intent1.putExtra("author", channelNameStr);
+                intent1.putExtra("tracks", (Serializable) tracks);
+                intent1.putExtra("position",position);
                 serviceConnection = new ServiceConnection() {
                     @Override
                     public void onServiceConnected(ComponentName name, IBinder service) {
@@ -241,6 +265,71 @@ public class MusicPlayService extends Service {
             }
         }
     }
+     public static class NotificationBroadCast extends BroadcastReceiver {
+         com.example.musicplayerv1.Common.Timer timer;
 
+         @Override
+         public void onReceive(final Context context, Intent intent) {
+
+             String message = intent.getAction();
+             Log.d("tag", "run here");
+             switch (message){
+                 case "Pause":
+                     if (mediaPlayer.isPlaying()) {
+                     mediaPlayer.pause();
+
+                 } else {
+                     mediaPlayer.start();
+                 }
+                     break;
+                 case "Next Song":
+                   position++;
+
+                    playSong(context,position);
+                     break;
+                 case "Previous Song":
+                     position--;
+                     playSong(context,position);
+                     break;
+                 default:
+                     break;
+             }
+         }
+         private void sendBroadcast(Context context,String streamLink, String urlThumbnail, long duration, String description, String trackName, String artist,int position) {
+             Intent intent = new Intent();
+             intent.setAction("Pass Track to Home Fragment");
+             intent.putExtra("streamLink", streamLink);
+             intent.putExtra("urlThumbnail", urlThumbnail);
+             intent.putExtra("duration", duration);
+             intent.putExtra("description", description);
+             intent.putExtra("channelName", artist);
+             intent.putExtra("Title", trackName);
+             intent.putExtra("tracks", (Serializable) tracks);
+             intent.putExtra("position",position);
+             Log.d("check", String.valueOf(tracks == null));
+             context.sendBroadcast(intent);
+         }
+         private void playSong(final Context context, final int positionH){
+             mediaPlayer.release();
+             context.stopService(new Intent(context,MusicPlayService.class));
+             QueryTrackUrl queryTrackUrl = new QueryTrackUrl(tracks.get(positionH).getId(),PlayMusic.requestQueue,context);
+             queryTrackUrl.returnUrl(new IPassUrl() {
+                 @Override
+                 public void getUr(final Track url) {
+                     sendBroadcast(context,url.getStreamLink()
+                             , tracks.get(positionH).getUrlThumbnail()
+                             , url.getDuration()
+                             , tracks.get(positionH).getDescription()
+                             , tracks.get(positionH).getTrackName()
+                             , tracks.get(positionH).getArtist()
+                                , positionH);
+
+                     timer = new com.example.musicplayerv1.Common.Timer(tracks,context,positionH);
+                     timer.countDown(null,0,url.getDuration()*1000,null,null,PlayMusic.requestQueue,true);
+
+                 }
+             });
+         }
+     }
 }
 

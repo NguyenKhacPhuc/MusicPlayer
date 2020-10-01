@@ -3,10 +3,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:elevation="8dp"
-    android:layout_marginTop="8dp"
+    android:elevation="16dp"
+    android:layout_marginTop="24dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     >
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+       android:layout_below="@+id/fav"
+        android:alpha="0.3"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="12dp"
+        android:background="@color/black"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -41,7 +50,7 @@
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginBottom="8dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="12dp"
         android:layout_centerHorizontal="true"
         android:contentDescription="Thumbnail" />
     <ImageView
@@ -50,6 +59,7 @@
         android:src="@drawable/more_vert_24"
         android:layout_below="@id/thumbnail"
         android:id="@+id/more"
+        android:layout_marginTop="8dp"
         android:layout_alignParentRight="true"
         android:layout_marginRight="16dp"
         />
@@ -60,7 +70,8 @@
         android:layout_toLeftOf="@+id/more"
         android:layout_below="@id/thumbnail"
         android:id="@+id/add_to_playlist"
-        android:layout_marginRight="16dp"/>
+        android:layout_marginTop="8dp"
+        android:layout_marginRight="32dp"/>
     <ImageView
         android:layout_width="24dp"
         android:layout_height="24dp"
@@ -68,5 +79,6 @@
         android:src="@drawable/ic_baseline_favorite_border_24"
         android:layout_toLeftOf="@+id/add_to_playlist"
         android:layout_below="@id/thumbnail"
-        android:layout_marginRight="16dp"/>
+        android:layout_marginTop="8dp"
+        android:layout_marginRight="32dp"/>
 </RelativeLayout>

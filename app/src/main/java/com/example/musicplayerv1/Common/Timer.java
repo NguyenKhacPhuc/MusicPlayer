@@ -16,6 +16,7 @@ import com.android.volley.RequestQueue;
 
 import com.example.musicplayerv1.APIQuery.QueryTrackUrl;
 
+import com.example.musicplayerv1.Activities.PlayMusic;
 import com.example.musicplayerv1.Interfaces.IDurationCallBack;
 import com.example.musicplayerv1.Interfaces.IPassUrl;
 
@@ -50,18 +51,20 @@ public class Timer {
             , final RequestQueue requestQueue
             , boolean isNotRewind
 
+
     ) {
         if (isNotRewind) {
             ++index;
         }
 
+        if(PlayMusic.isAlive && seekbar != null && start != null && end != null) {
+            seekbar.setProgress((int) (currentProgress / 1000));
+            temp = duration;
+            currentTemp = currentProgress;
 
-        seekbar.setProgress((int) (currentProgress / 1000));
-        temp = duration;
-        currentTemp = currentProgress;
-
-        start.setText(Converting.convertToSecond(currentTemp));
-        end.setText(Converting.convertToSecond(temp));
+            start.setText(Converting.convertToSecond(currentTemp));
+            end.setText(Converting.convertToSecond(temp));
+        }
         if (countDownTimer != null) {
             countDownTimer.cancel();
         }
@@ -69,14 +72,16 @@ public class Timer {
         countDownTimer = new MyCountDownTimer(duration, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
-                int current = seekbar.getProgress();
-                temp = temp - 1000;
-                currentTemp = currentTemp + 1000;
-                seekbar.setProgress(current + 1);
-                String strDuration = Converting.convertToSecond(temp);
-                String strCurrent = Converting.convertToSecond(currentTemp);
-                start.setText(strCurrent);
-                end.setText(strDuration);
+                if(PlayMusic.isAlive && seekbar != null && start != null && end != null) {
+                    int current = seekbar.getProgress();
+                    temp = temp - 1000;
+                    currentTemp = currentTemp + 1000;
+                    seekbar.setProgress(current + 1);
+                    String strDuration = Converting.convertToSecond(temp);
+                    String strCurrent = Converting.convertToSecond(currentTemp);
+                    start.setText(strCurrent);
+                    end.setText(strDuration);
+                }
             }
 
             @Override
@@ -91,8 +96,15 @@ public class Timer {
                     queryTrackUrl.returnUrl(new IPassUrl() {
                         @Override
                         public void getUr(Track url) {
-                            sendBroadcast(url.getStreamLink(), track.getUrlThumbnail(), url.getDuration(), track.getDescription(), track.getTrackName(), track.getArtist());
-                            iDurationCallBack.passDuration(url.getDuration(), index);
+                            if(PlayMusic.isRepeat){
+                                iDurationCallBack.passDuration(url.getDuration(), index);
+                            }
+                            else{
+                                sendBroadcast(url.getStreamLink(), track.getUrlThumbnail(), url.getDuration(), track.getDescription(), track.getTrackName(), track.getArtist());
+                                iDurationCallBack.passDuration(url.getDuration(), index);
+                            }
+
+
 
                         }
                     });
@@ -111,8 +123,12 @@ public class Timer {
 //                        countDownTimer.setMillisInFuture(milDuration);
 //                        countDownTimer.setCountdownInterval(1000);
 //                        countDownTimer.start();
-                        countDown(seekbar, 0, milDuration, start, end, requestQueue, true);
-
+                        if(PlayMusic.isRepeat) {
+                            countDown(seekbar, 0, milDuration, start, end, requestQueue, false);
+                        }
+                        else{
+                            countDown(seekbar, 0, milDuration, start, end, requestQueue, true);
+                        }
                     }
                 };
             }

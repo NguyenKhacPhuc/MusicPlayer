@@ -36,6 +36,16 @@
         android:layout_marginTop="10dp"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginLeft="10dp"/>
+    <ImageButton
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:id="@+id/shuffleBtn"
+        android:background="@drawable/round"
+        app:layout_constraintTop_toBottomOf="@+id/seekbar"
+        android:src="@drawable/shuffle_24"
+        android:layout_marginTop="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginRight="10dp"/>
 
     <ImageButton
         android:layout_width="50dp"
@@ -135,8 +145,8 @@
         android:background="@drawable/round"
         android:elevation="8dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/seekbar"
-        android:layout_marginTop="64dp"
+        app:layout_constraintTop_toBottomOf="@id/heart"
+        android:layout_marginTop="42dp"
         android:layout_marginRight="64dp"/>
     <ImageButton
         android:layout_width="50dp"
@@ -147,8 +157,8 @@
         android:elevation="8dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/seekbar"
-        android:layout_marginTop="64dp"/>
+        app:layout_constraintTop_toBottomOf="@+id/heart"
+        android:layout_marginTop="42dp"/>
     <ImageButton
         android:layout_width="50dp"
         android:layout_height="50dp"
@@ -156,8 +166,8 @@
         android:id="@+id/previous"
         android:elevation="8dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/seekbar"
-        android:layout_marginTop="64dp"
+        app:layout_constraintTop_toBottomOf="@id/heart"
+        android:layout_marginTop="42dp"
         android:layout_marginLeft="64dp"
         android:background="@drawable/round"/>
     <TextView
@@ -172,7 +182,7 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="24dp"
         android:id="@+id/heart"
         android:src="@drawable/ic_baseline_favorite_border_24"
         app:layout_constraintTop_toBottomOf="@+id/seekbar"
@@ -188,25 +198,4 @@
         app:layout_constraintTop_toBottomOf="@id/seekbar"
         app:layout_constraintEnd_toEndOf="@+id/seekbar"
         android:layout_marginTop="10dp"/>
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/description"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:textSize="16sp"
-        android:layout_marginTop="10dp"
-        android:ellipsize="end"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintTop_toBottomOf="@+id/play"
-        android:typeface="serif"
-        android:maxHeight="100dp"
-        android:gravity="center"
-        android:layout_marginRight="32dp"
-        android:lineSpacingExtra="4dp"
-        android:layout_marginLeft="32dp"
-        android:maxLines="4"
-        android:text="Dab the Sky (Said the Sky Dabin) - Digital Mirage 2020 Join the Notification Squad! Click the 🔔Bell. ✘ Prox Spotify Playlist!: http://spoti.fi/Proximity ✘ Proximity Instagram: http://instagram.com/Proximity ✘✘ Discord! :) - http://discord.gg/Proximity - Proximity Merch: http://prxmusic.com/collections DAB THE SKY. This set at 86,000 of you all watching it live on Friday and now I get to present it to you all in its entirety w/ perfect direct audio. Hope you all enjoy! :) 🔥ALL DIGITAL MIRAGE SETS🔥: https://www.youtube.com/playlist?list=PL3osQJLUr9gIZrGxgrs-uxomQvR1URRTb •Brownies Lemonade: https://twitter.com/TeamBandL https://www.instagram.com/browniesandlemonade/ https://www.youtube.com/user/browniesandlemonade •Dabin: https://soundcloud.com/dabinlee https://www.facebook.com/dabinmusic https://twitter.com/iamdabinlee https://www.youtube.com/user/dabinmusic •Said The Sky: https://soundcloud.com/said-the-sky https://www.facebook.com/saidthesky https://twitter.com/SaidTheSky ⚡Copyright Free Music!⚡ http://bit.ly/CopyrightFreePRX #dabthesky #dabin #saidthesky"
-       />
 </androidx.constraintlayout.widget.ConstraintLayout>

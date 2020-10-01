@@ -11,6 +11,7 @@ public class Model {
     private String mTag;
     private String idList;
     private IItemPreviewClick iItemPreviewClick;
+    private String queryId;
 
     public Model(String title, String description, ArrayList<Track> tracks, String mTag,IItemPreviewClick iItemPreviewClick) {
         this.title = title;
@@ -18,17 +19,23 @@ public class Model {
         this.tracks = tracks;
         this.mTag = mTag;
         this.iItemPreviewClick = iItemPreviewClick;
+
     }
 
     public void setiItemPreviewClick(IItemPreviewClick iItemPreviewClick) {
         this.iItemPreviewClick = iItemPreviewClick;
     }
 
-    public Model(String title, String description, String mTag, String idList) {
+    public Model(String title, String description, String mTag, String idList,String queryId) {
         this.title = title;
         this.description = description;
         this.mTag = mTag;
         this.idList = idList;
+        this.queryId = queryId;
+    }
+
+    public String getQueryId() {
+        return queryId;
     }
 
     public String getIdList() {

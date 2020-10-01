@@ -3,15 +3,11 @@ package com.example.musicplayerv1.Activities;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.DownloadManager;
-import android.app.Notification;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -50,8 +46,6 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.example.musicplayerv1.APIQuery.QueryTrackUrl;
-import com.example.musicplayerv1.App;
-import com.example.musicplayerv1.Common.ProgressDialogSingleton;
 import com.example.musicplayerv1.Common.Timer;
 import com.example.musicplayerv1.Injection;
 import com.example.musicplayerv1.Interfaces.IPassUrl;
@@ -59,22 +53,17 @@ import com.example.musicplayerv1.Model.Track;
 import com.example.musicplayerv1.R;
 import com.example.musicplayerv1.Services.MusicPlayService;
 import com.example.musicplayerv1.SubFragment.BottomSheetFragment;
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.example.musicplayerv1.YoutubeConfig.YoutubeConstant;
 
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-
-import static com.example.musicplayerv1.App.CHANNEL_ID;
-import static com.example.musicplayerv1.App.MUSICPLAYSERVICE;
-import static com.example.musicplayerv1.App.SERVICECONNECTION;
 
 public class PlayMusic extends AppCompatActivity implements View.OnClickListener, PopupMenu.OnMenuItemClickListener, SeekBar.OnSeekBarChangeListener {
     Toolbar toolbar;
@@ -108,18 +97,18 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
     ImageButton stopPlay;
     static ArrayList<Track> tracks;
     QueryTrackUrl queryTrackUrl;
-    RequestQueue requestQueue;
+    public static RequestQueue requestQueue;
     ExecutorService executorService;
     ArrayList<String> keyLst;
     TrackBroadcastReceiver trackBroadcastReceiver;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
     ImageButton repeatBtn;
-    boolean isRepeat;
+    ImageButton backBtn;
+    public static boolean isRepeat;
     public static int position;
     public static boolean isBind = false;
     public static boolean isAlive;
-
     public static ArrayList<Track> getTracks() {
         return tracks;
     }
@@ -129,7 +118,9 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
         super.onCreate(savedInstanceState);
         setContentView(R.layout.play_act);
         Intent intentReceiver = getIntent();
-        tracks = (ArrayList<Track>) intentReceiver.getSerializableExtra("tracks");
+        tracks = new ArrayList<>();
+        tracks.clear();
+        tracks.addAll((ArrayList<Track>) intentReceiver.getSerializableExtra("tracks"));
         position = intentReceiver.getIntExtra("position", 0);
         initView();
 
@@ -158,6 +149,7 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
         next.setOnClickListener(this);
         previous.setOnClickListener(this);
         repeatBtn.setOnClickListener(this);
+        backBtn.setOnClickListener(this);
         Set<String> keySet = sharedPreferences.getAll().keySet();
         keyLst = new ArrayList<>(keySet);
         if (keyLst.contains(tracks.get(position).getId())) {
@@ -183,7 +175,6 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
         thumbnail = findViewById(R.id.thumbnail);
         trackName = findViewById(R.id.track_name);
         channelName = findViewById(R.id.channel_name);
-        description = findViewById(R.id.description);
         durationBegin = findViewById(R.id.durationBegin);
         durationFinish = findViewById(R.id.durationFinish);
         seekBar = findViewById(R.id.seekbar);
@@ -197,6 +188,7 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
         requestQueue = Volley.newRequestQueue(this);
         sharedPreferences = getSharedPreferences("LIKED", MODE_PRIVATE);
         editor = sharedPreferences.edit();
+        backBtn = findViewById(R.id.backBtn);
         executorService = Executors.newSingleThreadExecutor();
 
     }
@@ -219,6 +211,7 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
                     editor.remove(tracks.get(position).getId());
                 } else {
                     heart.setImageResource(R.drawable.ic_baseline_favorite_24);
+                    heart.setAlpha(0.5f);
                     isLiked = true;
 
                     editor.putString(tracks.get(position).getId(), tracks.get(position).getTrackName());
@@ -229,7 +222,6 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
                 //TODO: next track
                 musicPlayService.release();
 
-                getApplicationContext().stopService(new Intent(getApplicationContext(), MusicPlayService.class));
                 position += 1;
                 triggerMusic(position, 0L);
 
@@ -256,13 +248,8 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
             case R.id.previous:
                 //TODO: move to previous track
                 musicPlayService.release();
-                stopService(new Intent(getApplicationContext(), MusicPlayService.class));
                 position -= 1;
                 triggerMusic(position, 0L);
-                break;
-            case R.id.backBtn:
-                //TODO: move to previous activity
-                startActivity(new Intent(this, MainActivity.class));
                 break;
             case R.id.repeatBtn:
                 if (isRepeat) {
@@ -275,6 +262,9 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
                     repeatBtn.setImageResource(R.drawable.repeat_one_24);
                     isRepeat = true;
                 }
+                break;
+            case R.id.backBtn:
+                onBackPressed();
                 break;
             default:
                 break;
@@ -320,6 +310,10 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
                 }
                 break;
             case R.id.share:
+                Intent send = new Intent(Intent.ACTION_SEND);
+                send.setType("text/plain");
+                send.putExtra(Intent.EXTRA_TEXT, YoutubeConstant.YOUTUBE_LINK+tracks.get(position).getId());
+                startActivity(send);
                 break;
             default:
                 break;
@@ -430,6 +424,7 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
         trackBroadcastReceiver = new TrackBroadcastReceiver();
         registerReceiver(trackBroadcastReceiver, intentFilter);
         isAlive = true;
+        isRepeat = false;
 
     }
 
@@ -471,7 +466,6 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
                             Glide.with(PlayMusic.this).load(urlThumbnail).into(thumbnail);
                             trackName.setText(title);
                             channelName.setText(author);
-                            description.setText(shortDescription);
                             milDuration = duration * 1000;
                             seekBar.setMax((int) (milDuration / 1000));
                             timer.countDown(seekBar, currentMil, milDuration, durationBegin, durationFinish, requestQueue, true);
@@ -495,7 +489,6 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
                             Glide.with(PlayMusic.this).load(urlThumbnail).into(thumbnail);
                             trackName.setText(title);
                             channelName.setText(author);
-                            description.setText(shortDescription);
                             final Track track = new Track(tracks.get(position).getId(), author, title, urlThumbnail, isLiked, shortDescription,duration, streamLink);
                             executorService.execute(new Runnable() {
                                 @Override
@@ -524,6 +517,7 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
         super.onDestroy();
         unregisterReceiver(trackBroadcastReceiver);
         isAlive = false;
+
     }
 
     @Override

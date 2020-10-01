@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,7 @@ import com.example.musicplayerv1.Activities.PlayMusic;
 import com.example.musicplayerv1.Adapters.CardStackAdapter;
 import com.example.musicplayerv1.Injection;
 import com.example.musicplayerv1.Interfaces.IPlaylistAddingClick;
+import com.example.musicplayerv1.MainFragment.StreamFragment;
 import com.example.musicplayerv1.Model.Container;
 import com.example.musicplayerv1.Model.Playlist;
 
@@ -41,14 +43,18 @@ import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.sql.StatementEvent;
+
 public class BottomSheetFragment extends BottomSheetDialogFragment implements View.OnClickListener, IPlaylistAddingClick {
     View v;
     RecyclerView cardStackView;
     LinearLayoutManager cardStackLayoutManager;
     CardStackAdapter cardStackAdapter;
+    Container container;
     ExecutorService executorService;
     Button create;
     Dialog dialog;
+    Track track;
     ArrayList<Playlist> models;
     @Nullable
     @Override
@@ -100,7 +106,13 @@ public class BottomSheetFragment extends BottomSheetDialogFragment implements Vi
                 @Override
                 public void onClick(View v) {
                     String name = nameOfThePlaylst.getText().toString();
-                    Track track = PlayMusic.getTracks().get(PlayMusic.position);
+                    if(getActivity() instanceof PlayMusic){
+                        track = PlayMusic.getTracks().get(PlayMusic.position);
+                    }
+                    else{
+                        track = StreamFragment.tracksOfStream.get(StreamFragment.positionOfStream);
+                        Log.d("check null",track.getTrackName());
+                    }
 
                     final Playlist playlist = new Playlist(name,track.getUrlThumbnail(),0);
 
@@ -128,7 +140,13 @@ public class BottomSheetFragment extends BottomSheetDialogFragment implements Vi
 
     @Override
     public void onPlaylistItemAddingClick(final String playlistID) {
-        final Container container = new Container(PlayMusic.getTracks().get(PlayMusic.position).getId(),playlistID);
+        if(getContext() instanceof  PlayMusic){
+            container = new Container(PlayMusic.getTracks().get(PlayMusic.position).getId(),playlistID);
+        }
+        else {
+            container = new Container(StreamFragment.tracksOfStream.get(StreamFragment.positionOfStream).getId(), playlistID);
+
+        }
         executorService.execute(new Runnable() {
             @Override
             public void run() {
