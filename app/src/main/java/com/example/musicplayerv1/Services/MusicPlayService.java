@@ -2,6 +2,7 @@ package com.example.musicplayerv1.Services;
 
 import android.animation.Animator;
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -232,6 +233,7 @@ public class MusicPlayService extends Service {
         @Override
         public void onReceive(final Context context, Intent intent) {
             if (!PlayMusic.isAlive ) {
+                mediaPlayer.release();
                 stopSelf();
                 String channelNameStr = intent.getStringExtra("channelName");
                 String trackNameStr = intent.getStringExtra("Title");
@@ -283,12 +285,12 @@ public class MusicPlayService extends Service {
                  }
                      break;
                  case "Next Song":
-                   position++;
+                   position+=1;
 
                     playSong(context,position);
                      break;
                  case "Previous Song":
-                     position--;
+                     position-=1;
                      playSong(context,position);
                      break;
                  default:
@@ -310,6 +312,7 @@ public class MusicPlayService extends Service {
              context.sendBroadcast(intent);
          }
          private void playSong(final Context context, final int positionH){
+             timer = new com.example.musicplayerv1.Common.Timer(tracks,context,positionH);
              mediaPlayer.release();
              context.stopService(new Intent(context,MusicPlayService.class));
              QueryTrackUrl queryTrackUrl = new QueryTrackUrl(tracks.get(positionH).getId(),PlayMusic.requestQueue,context);
@@ -324,7 +327,6 @@ public class MusicPlayService extends Service {
                              , tracks.get(positionH).getArtist()
                                 , positionH);
 
-                     timer = new com.example.musicplayerv1.Common.Timer(tracks,context,positionH);
                      timer.countDown(null,0,url.getDuration()*1000,null,null,PlayMusic.requestQueue,true);
 
                  }

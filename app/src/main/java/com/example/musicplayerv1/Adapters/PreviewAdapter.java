@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.musicplayerv1.Interfaces.IItemPreviewClick;
 import com.example.musicplayerv1.Model.Track;
 import com.example.musicplayerv1.R;
@@ -39,7 +40,7 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.PreviewH
     public void onBindViewHolder(@NonNull PreviewHolder holder, int position) {
             holder.trackName.setText(tracks.get(position).getTrackName());
             holder.artist.setText(tracks.get(position).getArtist());
-            Glide.with(context).load(tracks.get(position).getUrlThumbnail()).into(holder.imageView);
+            Glide.with(context).load(tracks.get(position).getUrlThumbnail()).apply(RequestOptions.centerCropTransform()).into(holder.imageView);
 
     }
 

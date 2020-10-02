@@ -45,6 +45,7 @@ import android.widget.Toast;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.musicplayerv1.APIQuery.QueryTrackUrl;
 import com.example.musicplayerv1.Common.Timer;
 import com.example.musicplayerv1.Injection;
@@ -425,7 +426,6 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
         registerReceiver(trackBroadcastReceiver, intentFilter);
         isAlive = true;
         isRepeat = false;
-
     }
 
     @Override
@@ -486,7 +486,7 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
                             shortDescription = url.getDescription();
                             urlThumbnail = tracks.get(position).getUrlThumbnail();
                             streamLink = url.getStreamLink();
-                            Glide.with(PlayMusic.this).load(urlThumbnail).into(thumbnail);
+                            Glide.with(PlayMusic.this).load(urlThumbnail).apply(RequestOptions.centerCropTransform()).into(thumbnail);
                             Animation rotate = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotateanim);
                             thumbnail.startAnimation(rotate);
                             trackName.setText(title);

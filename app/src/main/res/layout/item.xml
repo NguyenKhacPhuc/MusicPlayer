@@ -13,9 +13,8 @@
         android:src="@drawable/shuffle_24"
         android:id="@+id/shuffleBtn"
         android:layout_alignParentRight="true"
-       android:layout_margin="8dp"
+       android:layout_margin="16dp"
         android:background="@drawable/round"
-
         />
         <TextView
             android:layout_width="wrap_content"
