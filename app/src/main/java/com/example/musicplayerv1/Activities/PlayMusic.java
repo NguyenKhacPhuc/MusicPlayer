@@ -154,6 +154,7 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
                 }
             };
             bindService(new Intent(getApplicationContext(), MusicPlayService.class), serviceConnection, Context.BIND_AUTO_CREATE);
+            isBind= true;
         }
 
         triggerMusic(position, intentCurrentMil);
@@ -236,9 +237,10 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
             case R.id.next:
                 //TODO: next track
                 musicPlayService.release();
-              stopService(new Intent(getApplicationContext(),MusicPlayService.class));
+                stopService(new Intent(getApplicationContext(),MusicPlayService.class));
                 position += 1;
                 triggerMusic(position, 0L);
+
 
                 break;
             case R.id.play:
@@ -553,6 +555,7 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(trackBroadcastReceiver);
+        unbindService(serviceConnection);
         isAlive = false;
 
     }
