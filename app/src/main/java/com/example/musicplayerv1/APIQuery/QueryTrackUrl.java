@@ -2,6 +2,7 @@ package com.example.musicplayerv1.APIQuery;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.util.SparseArray;
 import android.widget.Toast;
@@ -9,6 +10,7 @@ import android.widget.Toast;
 import com.android.volley.RequestQueue;
 import com.example.musicplayerv1.Interfaces.IPassUrl;
 import com.example.musicplayerv1.Model.Track;
+import com.example.musicplayerv1.Services.MusicPlayService;
 import com.example.musicplayerv1.YoutubeConfig.YoutubeConstant;
 
 import at.huber.youtubeExtractor.VideoMeta;
@@ -46,7 +48,7 @@ public class  QueryTrackUrl  {
                     Track track = new Track(videoId, title, author, description, duration, finalUrl);
                     iPassUrl.getUr(track);
                 }catch (NullPointerException n){
-                    n.printStackTrace();
+                   context.stopService(new Intent(context, MusicPlayService.class));
                 }
             }
         }.extract(trackUrl,true,true);

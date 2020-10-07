@@ -89,8 +89,6 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
     ImageView heart;
     Timer timer;
     static ServiceConnection serviceConnection;
-    ServiceConnection serviceConnection1;
-    MusicPlayService musicPlayService1;
     static MusicPlayService musicPlayService;
     long intentCurrentMil;
     ImageButton next;
@@ -142,6 +140,21 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
         if (musicPlayService != null) {
             musicPlayService.release();
         }
+        else{
+            serviceConnection = new ServiceConnection() {
+                @Override
+                public void onServiceConnected(ComponentName name, IBinder service) {
+                    MusicPlayService.MediaBinder mediaBinder = (MusicPlayService.MediaBinder) service;
+                    musicPlayService = mediaBinder.getService();
+                }
+
+                @Override
+                public void onServiceDisconnected(ComponentName name) {
+
+                }
+            };
+            bindService(new Intent(getApplicationContext(), MusicPlayService.class), serviceConnection, Context.BIND_AUTO_CREATE);
+        }
 
         triggerMusic(position, intentCurrentMil);
 
@@ -156,6 +169,7 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
         if (keyLst.contains(tracks.get(position).getId())) {
             heart.setImageResource(R.drawable.ic_baseline_favorite_24);
             isLiked = true;
+
         }
         executorService = Executors.newSingleThreadExecutor();
         executorService.execute(new Runnable() {
@@ -222,13 +236,25 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
             case R.id.next:
                 //TODO: next track
                 musicPlayService.release();
-
+              stopService(new Intent(getApplicationContext(),MusicPlayService.class));
                 position += 1;
                 triggerMusic(position, 0L);
 
                 break;
             case R.id.play:
                 //TODO: pause/play track
+                serviceConnection = new ServiceConnection() {
+                    @Override
+                    public void onServiceConnected(ComponentName name, IBinder service) {
+                        MusicPlayService.MediaBinder mediaBinder = (MusicPlayService.MediaBinder) service;
+                        musicPlayService = mediaBinder.getService();
+                    }
+
+                    @Override
+                    public void onServiceDisconnected(ComponentName name) {
+
+                    }
+                };
                 if (musicPlayService.isPlaying()) {
                     musicPlayService.paused();
                     timer.cancel();
@@ -249,6 +275,7 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
             case R.id.previous:
                 //TODO: move to previous track
                 musicPlayService.release();
+                stopService(new Intent(getApplicationContext(),MusicPlayService.class));
                 position -= 1;
                 triggerMusic(position, 0L);
                 break;
@@ -323,19 +350,7 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
     }
 
     void playMusic() {
-        serviceConnection = new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName name, IBinder service) {
-                MusicPlayService.MediaBinder mediaBinder = (MusicPlayService.MediaBinder) service;
-                musicPlayService = mediaBinder.getService();
-                musicPlayService.play();
-            }
 
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-
-            }
-        };
         Intent intent = new Intent(getApplicationContext(), MusicPlayService.class);
         intent.putExtra("streamLink", streamLink);
         intent.putExtra("title", title);
@@ -343,9 +358,8 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
         intent.putExtra("author", author);
         intent.putExtra("tracks", (Serializable) tracks);
         intent.putExtra("position", position);
+        intent.putExtra("liked",isLiked);
         getApplicationContext().startService(intent);
-        getApplicationContext().bindService(new Intent(getApplicationContext(), MusicPlayService.class), serviceConnection, Context.BIND_AUTO_CREATE);
-        isBind = true;
 
     }
 
@@ -374,11 +388,24 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
         if (fromUser) {
-            long milProgress = progress * 1000;
+            final long milProgress = progress * 1000;
             long currentDuration = milDuration - milProgress;
 
             timer.countDown(seekBar, milProgress, currentDuration, durationBegin, durationFinish, requestQueue, false);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                serviceConnection = new ServiceConnection() {
+                    @Override
+                    public void onServiceConnected(ComponentName name, IBinder service) {
+                        MusicPlayService.MediaBinder mediaBinder = (MusicPlayService.MediaBinder) service;
+                        musicPlayService = mediaBinder.getService();
+
+                    }
+
+                    @Override
+                    public void onServiceDisconnected(ComponentName name) {
+
+                    }
+                };
                 musicPlayService.seekTo(milProgress);
             }
         }
@@ -398,6 +425,7 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
 
         @Override
         public void onReceive(final Context context, Intent intent) {
+            musicPlayService.release();
             stopService(new Intent(getApplicationContext(),MusicPlayService.class));
             String channelNameStr = intent.getStringExtra("channelName");
             String trackNameStr = intent.getStringExtra("Title");
@@ -408,11 +436,18 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
             shortDescription = intent.getStringExtra("description");
             channelName.setText(channelNameStr);
             trackName.setText(trackNameStr);
-            description.setText(shortDescription);
             Glide.with(getApplicationContext()).load(urlThumbnail).into(thumbnail);
-            playMusic();
+           serviceConnection = new ServiceConnection() {
+               @Override
+               public void onServiceConnected(ComponentName name, IBinder service) {
+                   MusicPlayService.MediaBinder mediaBinder = (MusicPlayService.MediaBinder) service;
+                   musicPlayService = mediaBinder.getService();
+               }
 
-
+               @Override
+               public void onServiceDisconnected(ComponentName name) {
+               }
+           };
         }
     }
 

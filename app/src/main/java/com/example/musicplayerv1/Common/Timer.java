@@ -56,12 +56,10 @@ public class Timer {
         if (isNotRewind) {
             ++index;
         }
-
+        temp = duration;
+        currentTemp = currentProgress;
         if(PlayMusic.isAlive && seekbar != null && start != null && end != null) {
             seekbar.setProgress((int) (currentProgress / 1000));
-            temp = duration;
-            currentTemp = currentProgress;
-
             start.setText(Converting.convertToSecond(currentTemp));
             end.setText(Converting.convertToSecond(temp));
         }
@@ -114,6 +112,7 @@ public class Timer {
                     public void passDuration(long duration, int index) {
                         long milDuration = duration * 1000;
                         int max = (int) duration;
+                        assert seekbar != null;
                         seekbar.setMax(max);
 //                            temp= milDuration;
 //                            currentTemp = 0;

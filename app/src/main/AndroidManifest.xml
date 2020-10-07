@@ -25,7 +25,22 @@
         <activity android:name=".TestActivity"/>
         <activity android:name=".Activities.PlaylistActivity"/>
         <service android:name=".Services.MusicPlayService"/>
-        <receiver android:name=".Services.MusicPlayService$NotificationBroadCast"/>
+        <receiver android:name=".Broadcast.NotificationBroadcast"
+            tools:ignore="Instantiatable"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="Next Song" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="Pause" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="Like" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="Previous Song" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
