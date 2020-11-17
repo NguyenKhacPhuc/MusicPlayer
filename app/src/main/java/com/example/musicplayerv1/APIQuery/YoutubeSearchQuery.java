@@ -41,7 +41,7 @@ public class YoutubeSearchQuery implements Runnable {
                 +query
                 +YoutubeConstant.KEY
                 +YoutubeConstant.API__SEARCH_KEY
-                +"&maxResults=10"
+                +"&maxResults=5"
                 ;
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET
                 ,url,null, new Response.Listener<JSONObject>() {

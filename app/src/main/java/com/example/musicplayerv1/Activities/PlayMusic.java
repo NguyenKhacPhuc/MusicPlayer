@@ -236,6 +236,18 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
                 break;
             case R.id.next:
                 //TODO: next track
+                serviceConnection = new ServiceConnection() {
+                    @Override
+                    public void onServiceConnected(ComponentName name, IBinder service) {
+                        MusicPlayService.MediaBinder mediaBinder = (MusicPlayService.MediaBinder) service;
+                        musicPlayService = mediaBinder.getService();
+                    }
+
+                    @Override
+                    public void onServiceDisconnected(ComponentName name) {
+
+                    }
+                };
                 musicPlayService.release();
                 stopService(new Intent(getApplicationContext(),MusicPlayService.class));
                 position += 1;
@@ -276,12 +288,36 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
                 break;
             case R.id.previous:
                 //TODO: move to previous track
+                serviceConnection = new ServiceConnection() {
+                    @Override
+                    public void onServiceConnected(ComponentName name, IBinder service) {
+                        MusicPlayService.MediaBinder mediaBinder = (MusicPlayService.MediaBinder) service;
+                        musicPlayService = mediaBinder.getService();
+                    }
+
+                    @Override
+                    public void onServiceDisconnected(ComponentName name) {
+
+                    }
+                };
                 musicPlayService.release();
                 stopService(new Intent(getApplicationContext(),MusicPlayService.class));
                 position -= 1;
                 triggerMusic(position, 0L);
                 break;
             case R.id.repeatBtn:
+                serviceConnection = new ServiceConnection() {
+                    @Override
+                    public void onServiceConnected(ComponentName name, IBinder service) {
+                        MusicPlayService.MediaBinder mediaBinder = (MusicPlayService.MediaBinder) service;
+                        musicPlayService = mediaBinder.getService();
+                    }
+
+                    @Override
+                    public void onServiceDisconnected(ComponentName name) {
+
+                    }
+                };
                 if (isRepeat) {
                     musicPlayService.dismissRepeat();
                     repeatBtn.setImageResource(R.drawable.repeat_24);
@@ -555,7 +591,6 @@ public class PlayMusic extends AppCompatActivity implements View.OnClickListener
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(trackBroadcastReceiver);
-        unbindService(serviceConnection);
         isAlive = false;
 
     }

@@ -30,6 +30,7 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:id="@+id/repeatBtn"
+        android:scaleType="centerInside"
         android:background="@drawable/round"
         app:layout_constraintTop_toBottomOf="@+id/seekbar"
         android:src="@drawable/repeat_24"
@@ -164,12 +165,13 @@
         android:layout_height="50dp"
         android:src="@drawable/previous_alt"
         android:id="@+id/previous"
+        android:background="@drawable/round"
         android:elevation="8dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/heart"
         android:layout_marginTop="42dp"
         android:layout_marginLeft="64dp"
-        android:background="@drawable/round"/>
+        />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -198,4 +200,5 @@
         app:layout_constraintTop_toBottomOf="@id/seekbar"
         app:layout_constraintEnd_toEndOf="@+id/seekbar"
         android:layout_marginTop="10dp"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

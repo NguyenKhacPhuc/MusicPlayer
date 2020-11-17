@@ -196,7 +196,7 @@ public class MusicPlayService extends Service {
     }
 
     public void release() {
-        mediaPlayer.stop();
+        mediaPlayer.release();
     }
 
     public int getDuration() {
@@ -247,7 +247,6 @@ public class MusicPlayService extends Service {
 
         @Override
         public void onReceive(final Context context, Intent intent) {
-
                 stopForeground(true);
                 mediaPlayer.release();
                 stopSelf();
@@ -258,7 +257,7 @@ public class MusicPlayService extends Service {
                 int position = intent.getIntExtra("position", 0);
                 String streamLink = intent.getStringExtra("streamLink");
                 tracks = (ArrayList<Track>) intent.getSerializableExtra("tracks");
-                Intent intent1 = new Intent(MusicPlayService.this, MusicPlayService.class);
+                Intent intent1 = new Intent(getApplicationContext() ,MusicPlayService.class);
                 intent1.putExtra("streamLink", streamLink);
                 intent1.putExtra("title", trackNameStr);
                 intent1.putExtra("thumbnail", urlThumbnail);
