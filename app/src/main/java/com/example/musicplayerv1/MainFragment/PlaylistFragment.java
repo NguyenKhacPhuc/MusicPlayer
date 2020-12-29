@@ -16,7 +16,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.musicplayerv1.Activities.PlayMusic;
-import com.example.musicplayerv1.Activities.PlaylistActivity;
 import com.example.musicplayerv1.Adapters.PlaylistAdapter;
 import com.example.musicplayerv1.Adapters.PreviewAdapter;
 import com.example.musicplayerv1.Injection;
@@ -132,11 +131,6 @@ public class PlaylistFragment extends Fragment implements IItemPreviewClick, IPl
                             }
                         });
                     }
-                    Intent intent = new Intent(getContext(), PlaylistActivity.class);
-                    intent.putExtra("containers", (Serializable) containers);
-                    intent.putExtra("position", position);
-                    intent.putExtra("title",name);
-                    startActivity(intent);
 
                 }
             });

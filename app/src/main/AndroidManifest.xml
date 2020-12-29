@@ -13,9 +13,10 @@
         android:supportsRtl="true"
         android:networkSecurityConfig="@xml/network_security_config"
         android:theme="@style/AppTheme"
-        tools:targetApi="n">
+        >
 
-        <activity android:name=".Activities.MainActivity">
+        <activity android:name=".Activities.MainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -23,7 +24,6 @@
         </activity>
         <activity android:name=".Activities.PlayMusic"/>
         <activity android:name=".TestActivity"/>
-        <activity android:name=".Activities.PlaylistActivity"/>
         <service android:name=".Services.MusicPlayService"/>
         <receiver android:name=".Broadcast.NotificationBroadcast"
             tools:ignore="Instantiatable"
