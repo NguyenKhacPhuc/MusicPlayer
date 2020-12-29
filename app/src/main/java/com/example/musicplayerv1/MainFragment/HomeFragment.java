@@ -117,9 +117,7 @@ public class HomeFragment extends Fragment implements IItemPreviewClick, IModelO
                 });
             }
         });
-
     }
-
 
     @Override
     public void modelOnClick(final ArrayList<Track> tracks) {
@@ -129,13 +127,11 @@ public class HomeFragment extends Fragment implements IItemPreviewClick, IModelO
         intent.putExtra("tracks", (Serializable) tracks);
         intent.putExtra("position", 0);
         Objects.requireNonNull(getContext()).startActivity(intent);
-
     }
 
     @Override
     public void onStart() {
         super.onStart();
-
     }
 
     @Override

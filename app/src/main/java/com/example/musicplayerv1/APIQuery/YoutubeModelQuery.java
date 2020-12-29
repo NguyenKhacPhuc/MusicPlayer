@@ -62,7 +62,6 @@ public class YoutubeModelQuery implements Runnable {
             @Override
             public void onResponse(JSONObject response) {
                 try {
-
                     JSONArray items = response.getJSONArray("items");
                     tracks.clear();
                     for (int i = 0; i < items.length(); i++) {
@@ -72,7 +71,12 @@ public class YoutubeModelQuery implements Runnable {
                         String channelTitle = snippet.getString("channelTitle");
                         String trackName = snippet.getString("title");
                         JSONObject thumbnails = snippet.getJSONObject("thumbnails");
-                        JSONObject defaultThumb = thumbnails.getJSONObject("high");
+                        JSONObject defaultThumb;
+                        try {
+                            defaultThumb = thumbnails.getJSONObject("high");
+                        }catch (JSONException j){
+                            defaultThumb = thumbnails.getJSONObject("default");
+                        }
                         String thumbnailUrl = defaultThumb.getString("url");
                         String id = resourceId.getString("videoId");
                         Track track = new Track(id, trackName, channelTitle, thumbnailUrl);

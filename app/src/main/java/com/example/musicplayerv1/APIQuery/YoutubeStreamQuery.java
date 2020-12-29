@@ -1,5 +1,7 @@
 package com.example.musicplayerv1.APIQuery;
 
+import android.util.Log;
+
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.Request;
@@ -58,6 +60,7 @@ public class YoutubeStreamQuery implements Runnable {
                         JSONObject defaultThumb = thumbnails.getJSONObject("high");
                         String thumbnailUrl = defaultThumb.getString("url");
                         String id = resourceId.getString("videoId");
+                        Log.d("id",id);
                         Track track = new Track(id,trackName, channelTitle,thumbnailUrl);
                         tracks.add(track);
                     }

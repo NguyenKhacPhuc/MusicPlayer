@@ -54,7 +54,6 @@ public class StreamFragment extends Fragment implements IStreamItemCallBack, Pop
     PopupMenu popupMenu;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
-
     boolean isLiked;
 
     View v;
@@ -79,9 +78,6 @@ public class StreamFragment extends Fragment implements IStreamItemCallBack, Pop
         editor = sharedPreferences.edit();
         executorService = Executors.newSingleThreadExecutor();
     }
-
-
-
 
     private void addData(){
         YoutubeStreamQuery youtubeStreamQuery = new YoutubeStreamQuery(tracksOfStream,streamAdadpter,requestQueue);

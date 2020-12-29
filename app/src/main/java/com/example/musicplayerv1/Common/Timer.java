@@ -102,8 +102,6 @@ public class Timer {
                                 iDurationCallBack.passDuration(url.getDuration(), index);
                             }
 
-
-
                         }
                     });
                 }

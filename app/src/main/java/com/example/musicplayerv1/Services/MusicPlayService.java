@@ -169,7 +169,8 @@ public class MusicPlayService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mediaPlayer.release();
+        /*mediaPlayer.release();
+         */
         stopForeground(true);
         unregisterReceiver(trackBroadcastReceiver);
         unregisterReceiver(stopBroadCast);

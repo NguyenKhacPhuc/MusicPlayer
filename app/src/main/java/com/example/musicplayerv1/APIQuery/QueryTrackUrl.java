@@ -45,6 +45,7 @@ public class  QueryTrackUrl  {
                     long duration = videoMeta.getVideoLength();
                     String description = videoMeta.getShortDescription();
                     String videoId = videoMeta.getVideoId();
+
                     Track track = new Track(videoId, title, author, description, duration, finalUrl);
                     iPassUrl.getUr(track);
                 }catch (NullPointerException n){
